@@ -1,0 +1,2 @@
+[run]
+omit = upsetjs_jupyter_widget/tests/*
