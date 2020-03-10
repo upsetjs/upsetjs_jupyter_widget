@@ -20,7 +20,7 @@ export class MockComm {
   on_msg(fn: Function | null) {
     this._on_msg = fn;
   }
-  _process_msg(msg: services.KernelMessage.ICommMsg) {
+  _process_msg(msg: services.KernelMessage.ICommMsgMsg) {
     if (this._on_msg) {
       return this._on_msg(msg);
     } else {
@@ -51,7 +51,7 @@ export class DummyManager extends widgets.ManagerBase<HTMLElement> {
     this.el = window.document.createElement('div');
   }
 
-  display_view(msg: services.KernelMessage.IMessage, view: Backbone.View<Backbone.Model>, options: any) {
+  display_view(_msg: services.KernelMessage.IMessage, view: Backbone.View<Backbone.Model>, _options: any) {
     // TODO: make this a spy
     // TODO: return an html element
     return Promise.resolve(view).then(view => {
@@ -61,7 +61,7 @@ export class DummyManager extends widgets.ManagerBase<HTMLElement> {
     });
   }
 
-  protected loadClass(className: string, moduleName: string, moduleVersion: string): Promise<any> {
+  protected loadClass(className: string, moduleName: string, _moduleVersion: string): Promise<any> {
     if (moduleName === '@jupyter-widgets/base') {
       if ((widgets as any)[className]) {
         return Promise.resolve((widgets as any)[className]);

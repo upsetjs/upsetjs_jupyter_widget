@@ -2,7 +2,6 @@
 # coding: utf-8
 
 # Copyright (c) Samuel Gratzl.
-# Distributed under the terms of the Modified BSD License.
 
 import pytest
 

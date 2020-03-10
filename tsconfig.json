@@ -1,12 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es5",
     "module": "commonjs",
     "lib": ["dom", "esnext"],
     "importHelpers": true,
     "declaration": true,
     "sourceMap": true,
-    "composite": true,
+    "outDir": "lib",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -18,8 +17,13 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
     "moduleResolution": "node",
     "jsx": "react",
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "target": "es2015"
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }
