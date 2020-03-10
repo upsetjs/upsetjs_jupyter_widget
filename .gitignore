@@ -154,3 +154,11 @@ upsetjs_jupyter_widget/labextension/*.tgz
 
 # Packed lab extensions
 upsetjs_jupyter_widget/labextension
+
+.yarnrc.yml
+.yarn
+*.tsbuildinfo
+.vscode
+src/**/*.js
+src/**/*.d.ts
+*.map

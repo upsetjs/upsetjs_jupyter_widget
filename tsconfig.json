@@ -1,22 +1,25 @@
 {
   "compilerOptions": {
-    "declaration": true,
-    "esModuleInterop":true,
-    "lib": ["es2015", "dom"],
+    "target": "es5",
     "module": "commonjs",
-    "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noUnusedLocals": true,
-    "outDir": "lib",
-    "resolveJsonModule": true,
-    "rootDir": "src",
-    "skipLibCheck": true,
+    "lib": ["dom", "esnext"],
+    "importHelpers": true,
+    "declaration": true,
     "sourceMap": true,
+    "composite": true,
     "strict": true,
-    "target": "es2015"
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-  ]
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "jsx": "react",
+    "esModuleInterop": true
+  }
 }

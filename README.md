@@ -1,9 +1,7 @@
 
 # upsetjs_jupyter_widget
 
-[![Build Status](https://travis-ci.org/upsetjs/upsetjs_jupyter_widget.svg?branch=master)](https://travis-ci.org/upsetjs/upsetjs_jupyter_widget)
-[![codecov](https://codecov.io/gh/upsetjs/upsetjs_jupyter_widget/branch/master/graph/badge.svg)](https://codecov.io/gh/upsetjs/upsetjs_jupyter_widget)
-
+[![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url]
 
 A Jupyter Widget Library around UpSet.js
 
@@ -27,3 +25,55 @@ the nbextension:
 ```bash
 jupyter nbextension enable --py [--sys-prefix|--user|--system] upsetjs_jupyter_widget
 ```
+
+
+
+## Dev Environment
+
+```sh
+npm i -g yarn
+yarn set version berry
+yarn plugin import version
+yarn plugin import @yarnpkg/plugin-workspace-tools
+yarn install
+yarn pnpify --sdk
+```
+
+## Commands
+
+## Testing
+
+```sh
+yarn test
+```
+
+## Linting
+
+TODO not working atm
+
+```sh
+yarn lint
+```
+
+## Building
+
+```sh
+yarn install
+yarn build
+```
+
+## License
+
+### Commercial license
+
+If you want to use Upset.js for a commercial application the commercial license is the appropriate license. With this option, your source code is kept proprietary. Contact @sgratzl for details
+
+### Open-source license
+
+GNU AGPLv3
+
+[npm-image]: https://badge.fury.io/js/@upsetjs/react.svg
+[npm-url]: https://npmjs.org/package/@upsetjs/react
+[github-actions-image]: https://github.com/sgratzl/upsetjs/workflows/nodeci/badge.svg
+[github-actions-url]: https://github.com/sgratzl/upsetjs/actions
+[codepen]: https://img.shields.io/badge/CodePen-open-blue?logo=codepen
