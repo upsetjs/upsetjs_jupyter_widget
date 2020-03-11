@@ -3,7 +3,7 @@ const version = require('./package.json').version;
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 
 // Custom webpack rules
-const rules = [{ test: /\.ts$/, loader: 'ts-loader' }];
+const rules = [{ test: /\.ts$/, loader: 'ts-loader', options: { configFile: 'tsconfig.build.json' } }];
 
 // Packages that shouldn't be bundled but loaded at runtime
 const externals = ['@jupyter-widgets/base'];

@@ -1,12 +1,11 @@
 module.exports = {
-  env: {
-    browser: true,
-    jest: true,
-  },
-  extends: ['prettier/@typescript-eslint', 'plugin:prettier/recommended'],
-  parser: '@typescript-eslint/parser',
+  extends: ['react-app', 'prettier/@typescript-eslint', 'plugin:prettier/recommended'],
   parserOptions: {
-    project: require.resolve('./tsconfig.json'),
+    project: './tsconfig.lint.json',
   },
-  plugins: ['@typescript-eslint'],
+  settings: {
+    react: {
+      version: '999.999.999',
+    },
+  },
 };

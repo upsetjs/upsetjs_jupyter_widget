@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // don't know why need explicit typeroots but otherwise it fails
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  }
+}

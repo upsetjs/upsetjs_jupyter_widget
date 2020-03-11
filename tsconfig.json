@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
+    "target": "es2015",
     "module": "commonjs",
     "lib": ["dom", "esnext"],
     "importHelpers": true,
-    "declaration": true,
     "sourceMap": true,
     "outDir": "lib",
     "strict": true,
@@ -22,8 +22,7 @@
     "jsx": "react",
     "esModuleInterop": true,
     "rootDir": "src",
-    "skipLibCheck": true,
-    "target": "es2015"
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

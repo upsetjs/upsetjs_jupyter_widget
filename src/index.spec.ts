@@ -10,7 +10,7 @@ describe('UpSet', () => {
     it('should be createable', () => {
       let model = createTestModel(UpSetModel);
       expect(model).toBeInstanceOf(UpSetModel);
-      expect(model.get('value')).toBe('Hello World');
+      expect(model.get('value')).toBe('Test');
     });
 
     it('should be createable with a value', () => {
