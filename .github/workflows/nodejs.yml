@@ -12,7 +12,6 @@ jobs:
           node-version: '12.x'
       - run: npm i -g yarn
       - run: yarn set version berry
-      - run: yarn plugin import @yarnpkg/plugin-workspace-tools
       - name: Cache Node.js modules
         uses: actions/cache@v1
         with:
