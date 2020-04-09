@@ -27,7 +27,7 @@ export class UpSetModel extends DOMWidgetModel {
   static readonly model_name = 'UpSetModel';
   static readonly model_module = MODULE_NAME;
   static readonly model_module_version = MODULE_VERSION;
-  static readonly view_name = 'UpsetView'; // Set to null if no view
+  static readonly view_name = 'UpSetView'; // Set to null if no view
   static readonly view_module = MODULE_NAME; // Set to null if no view
   static readonly view_module_version = MODULE_VERSION;
 }

@@ -57,7 +57,7 @@ module.exports = [
       path: path.resolve(__dirname, 'dist'),
       libraryTarget: 'amd',
       library: 'upsetjs_jupyter_widget',
-      publicPath: 'https://unpkg.com/upsetjs_jupyter_widget@' + version + '/dist/',
+      publicPath: 'https://unpkg.com/@upsetjs/jupyter_widget@' + version + '/dist/',
     },
     devtool: 'source-map',
     module: {

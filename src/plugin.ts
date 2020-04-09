@@ -11,14 +11,14 @@ const EXTENSION_ID = 'upsetjs_jupyter_widget:plugin';
 /**
  * The example plugin.
  */
-const examplePlugin: IPlugin<Application<Widget>, void> = {
+const upsetjsPlugin: IPlugin<Application<Widget>, void> = {
   id: EXTENSION_ID,
   requires: [IJupyterWidgetRegistry as any],
   activate: activateWidgetExtension,
   autoStart: true,
 };
 
-export default examplePlugin;
+export default upsetjsPlugin;
 
 /**
  * Activate the widget extension.
