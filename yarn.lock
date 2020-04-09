@@ -571,7 +571,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jupyter-widgets/base@npm:^4.0.0-alpha.0":
+"@jupyter-widgets/base@npm:^2 || ^3 || ^4.0.0-alpha.0":
   version: 4.0.0-alpha.0
   resolution: "@jupyter-widgets/base@npm:4.0.0-alpha.0"
   dependencies:
@@ -8493,7 +8493,7 @@ typescript@^3.8.3:
   version: 0.0.0-use.local
   resolution: "upsetjs_jupyter_widget@workspace:."
   dependencies:
-    "@jupyter-widgets/base": ^4.0.0-alpha.0
+    "@jupyter-widgets/base": ^2 || ^3 || ^4.0.0-alpha.0
     "@jupyterlab/services": ^5.1.0
     "@phosphor/application": ^1.7.3
     "@phosphor/widgets": ^1.9.3

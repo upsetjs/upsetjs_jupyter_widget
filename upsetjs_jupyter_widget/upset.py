@@ -49,13 +49,10 @@ class UpSetWidget(ValueWidget, DOMWidget):
             max=Int(None, allow_none=True),
             empty=Bool(False),
         ),
-        default_value=None,
-        allow_none=True,
+        default_value=dict(type="intersection"),
     ).tag(sync=True)
 
-    value = Union((Dict(traits=_setlike.copy()), List(Int(), default_value=[]))).tag(
-        sync=True
-    )
+    value = Union((Unicode(), List(Int(), default_value=[]))).tag(sync=True)
     queries = List(Dict(), default_value=[]).tag(sync=True)
 
     theme = Enum(("light", "dark"), default_value="light").tag(sync=True)
