@@ -55,18 +55,18 @@ jobs:
           python -m pip install pipenv
           pipenv install --dev
       - name: pytest
-        shell: pipenv run
+        shell: pipenv run {0}
         run: |
           pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
       - name: MyPy
-        shell: pipenv run
+        shell: pipenv run {0}
         run: |
           mypy -p upsetjs_jupyter_widget
       - name: Black
-        shell: pipenv run
+        shell: pipenv run {0}
         run: |
           black --target-version=py37 --check upsetjs_jupyter_widget
       - name: py.lint
-        shell: pipenv run
+        shell: pipenv run {0}
         run: |
           pylint upsetjs_jupyter_widget
