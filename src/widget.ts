@@ -65,12 +65,27 @@ export class UpSetView extends DOMWidgetView {
 
     const toCamelCase = (v: string) => v.replace(/([-_]\w)/g, (g) => g[1].toUpperCase());
 
+    const toPropName = (key: string) => {
+      if (key === 'value') {
+        return 'selection';
+      }
+      if (key.startsWith('_')) {
+        return toCamelCase(key.slice(1));
+      }
+      return toCamelCase(key);
+    };
+
     Object.keys(state).forEach((key) => {
       let v = state[key] as any;
-      if (key.startsWith('_') || key === 'layout') {
+      if (
+        v == null ||
+        (Array.isArray(v) && v.length === 0) ||
+        (key.startsWith('_') && key !== '_elems' && key !== '_sets') ||
+        key === 'layout'
+      ) {
         return;
       }
-      const propName = key === 'value' ? 'selection' : toCamelCase(key);
+      const propName = toPropName(key);
       if (propName === 'fontSizes' || propName === 'combinations') {
         const converted: any = {};
         Object.keys(v).forEach((key: string) => {

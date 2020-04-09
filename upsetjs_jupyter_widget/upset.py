@@ -41,6 +41,8 @@ class UpSetWidget(ValueWidget, DOMWidget):
     height_ratios = Tuple(Float(), Float(), default_value=(0.6, 0.4)).tag(sync=True)
 
     # # TODO data, sets
+    _elems = List(default_value=[]).tag(sync=True)
+    _sets = List(default_value=[]).tag(sync=True)
 
     combinations = Dict(
         traits=dict(
@@ -52,7 +54,16 @@ class UpSetWidget(ValueWidget, DOMWidget):
         default_value=dict(type="intersection"),
     ).tag(sync=True)
 
-    value = Union((Unicode(), List(Int(), default_value=[]))).tag(sync=True)
+    value = Union(
+        (
+            Dict(
+                traits=dict(name=Unicode(), elems=List(Int(), default_value=[])),
+                allow_none=True,
+                default_value=None,
+            ),
+            List(Int(), default_value=[]),
+        )
+    ).tag(sync=True)
     queries = List(Dict(), default_value=[]).tag(sync=True)
 
     theme = Enum(("light", "dark"), default_value="light").tag(sync=True)
