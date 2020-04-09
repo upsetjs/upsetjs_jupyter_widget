@@ -10,4 +10,4 @@ from ..upset import UpSetWidget
 
 def test_upset_creation_blank():
     w = UpSetWidget()
-    assert w.value == 'Test'
+    assert w.value == "Test"

@@ -162,3 +162,5 @@ upsetjs_jupyter_widget/labextension
 src/**/*.js
 src/**/*.d.ts
 *.map
+/.mypy_cache
+/junit
