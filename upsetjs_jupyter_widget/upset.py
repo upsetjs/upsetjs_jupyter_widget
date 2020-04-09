@@ -4,12 +4,13 @@
 UpSet.js Jupyter Widget
 """
 
-from ipywidgets import DOMWidget
-from traitlets import Unicode
+from ipywidgets import DOMWidget, Layout, ValueWidget, register
+from traitlets import default, Unicode
 from ._frontend import MODULE_NAME, MODULE_VERSION
 
 
-class UpSetWidget(DOMWidget):
+@register
+class UpSetWidget(ValueWidget, DOMWidget):
     """UpSet Widget
     """
 
@@ -21,3 +22,18 @@ class UpSetWidget(DOMWidget):
     _view_module_version = Unicode(MODULE_VERSION).tag(sync=True)
 
     value = Unicode("Test").tag(sync=True)
+
+    @property
+    def selection(self):
+        return self.value
+
+    @selection.setter
+    def selection(self, value):
+        self.value = value
+
+    @default("layout")
+    def _default_layout(self):
+        return Layout(height="600px", align_self="stretch")
+
+    def on_selection_changed(self, callback):
+        self.observe(lambda evt: callback(evt.new), "value")
