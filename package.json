@@ -2,33 +2,33 @@
   "name": "@upsetjs/jupyter_widget",
   "version": "0.1.0",
   "description": "A Jupyter Widget Library around UpSet.js",
-  "keywords": [
-    "jupyter",
-    "jupyterlab",
-    "jupyterlab-extension",
-    "widgets"
-  ],
-  "files": [
-    "lib/**/*.js",
-    "dist/*.js",
-    "css/*.css"
-  ],
-  "homepage": "https://github.com/upsetjs/upsetjs_jupyter_widget",
-  "bugs": {
-    "url": "https://github.com/upsetjs/upsetjs_jupyter_widget/issues"
-  },
   "license": "AGPL-3.0",
   "author": {
     "name": "Samuel Gratzl",
     "email": "samu@sgratzl.com",
     "url": "https://wwww.sgratzl.com"
   },
-  "main": "lib/index.js",
-  "types": "./lib/index.d.ts",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "widgets"
+  ],
+  "homepage": "https://github.com/upsetjs/upsetjs_jupyter_widget",
+  "bugs": {
+    "url": "https://github.com/upsetjs/upsetjs_jupyter_widget/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/upsetjs/upsetjs_jupyter_widget"
   },
+  "files": [
+    "lib/**/*.js",
+    "dist/*.js",
+    "css/*.css"
+  ],
+  "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "build": "npm run build:lib && npm run build:nbextension",
     "build:labextension": "npm run clean:labextension && mkdirp upsetjs_jupyter_widget/labextension && cd upsetjs_jupyter_widget/labextension && npm pack ../..",

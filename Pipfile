@@ -19,7 +19,6 @@ black = "*"
 autopep8 = "*"
 
 [packages]
-slack-cleaner2 = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"

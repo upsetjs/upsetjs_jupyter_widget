@@ -54,7 +54,7 @@ export class DummyManager extends widgets.ManagerBase<HTMLElement> {
   display_view(_msg: services.KernelMessage.IMessage, view: Backbone.View<Backbone.Model>, _options: any) {
     // TODO: make this a spy
     // TODO: return an html element
-    return Promise.resolve(view).then(view => {
+    return Promise.resolve(view).then((view) => {
       this.el.appendChild(view.el);
       view.on('remove', () => console.log('view removed', view));
       return view.el;
