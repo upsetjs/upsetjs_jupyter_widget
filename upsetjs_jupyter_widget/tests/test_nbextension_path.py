@@ -1,11 +1,16 @@
-#!/usr/bin/env python
 # coding: utf-8
-
 # Copyright (c) Samuel Gratzl.
+"""
+test case
+"""
 
 
 def test_nbextension_path():
+    """
+    test case
+    """
     # Check that magic function can be imported from package root:
+    # pylint: disable=C0415
     from upsetjs_jupyter_widget import _jupyter_nbextension_paths
 
     # Ensure that it can be called without incident:

@@ -1,7 +1,10 @@
-#!/usr/bin/env python
 # coding: utf-8
-
 # Copyright (c) Samuel Gratzl.
+# pylint: disable=W0221,C0103,C0116,W0212
+"""
+test case
+"""
+
 
 import pytest
 
@@ -19,18 +22,30 @@ class MockComm(Comm):
     kernel = "Truthy"
 
     def __init__(self, *args, **kwargs):
+        """
+        test case
+        """
         self.log_open = []
         self.log_send = []
         self.log_close = []
         super(MockComm, self).__init__(*args, **kwargs)
 
     def open(self, *args, **kwargs):
+        """
+        test case
+        """
         self.log_open.append((args, kwargs))
 
     def send(self, *args, **kwargs):
+        """
+        test case
+        """
         self.log_send.append((args, kwargs))
 
     def close(self, *args, **kwargs):
+        """
+        test case
+        """
         self.log_close.append((args, kwargs))
 
 
