@@ -18,6 +18,7 @@ black = "*"
 autopep8 = "*"
 pytest-cov = "*"
 nbval = "*"
+jupyterlab = "*"
 
 [packages]
 upsetjs_jupyter_widget = {editable = true,path = "."}

@@ -29,11 +29,7 @@ jupyter nbextension enable --py [--sys-prefix|--user|--system] upsetjs_jupyter_w
 ## Dev Environment
 
 ```sh
-npm i -g yarn
-yarn set version berry
-yarn plugin import version
-yarn install
-yarn pnpify --sdk
+npm i
 ```
 
 ## Commands
@@ -67,8 +63,8 @@ If you want to use Upset.js for a commercial application the commercial license 
 
 GNU AGPLv3
 
-[npm-image]: https://badge.fury.io/js/@upsetjs/jupyter_widget.svg
-[npm-url]: https://npmjs.org/package/@upsetjs/jupyter_widget
+[npm-image]: https://badge.fury.io/js/upsetjs_jupyter_widget.svg
+[npm-url]: https://npmjs.org/package/upsetjs_jupyter_widget
 [github-actions-image]: https://github.com/sgratzl/upsetjs/workflows/ci/badge.svg
 [github-actions-url]: https://github.com/sgratzl/upsetjs/actions
 [codepen]: https://img.shields.io/badge/CodePen-open-blue?logo=codepen
