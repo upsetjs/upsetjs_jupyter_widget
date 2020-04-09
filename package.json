@@ -11,6 +11,7 @@
   "keywords": [
     "jupyter",
     "jupyterlab",
+    "juptyerlab notebook",
     "jupyterlab-extension",
     "widgets"
   ],
@@ -39,7 +40,7 @@
     "clean:lib": "rimraf lib",
     "clean:labextension": "rimraf upsetjs_jupyter_widget/labextension",
     "clean:nbextension": "rimraf upsetjs_jupyter_widget/nbextension/static/index.js",
-    "prepack": "npm run build:lib",
+    "_prepack": "npm run build:lib",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "jest --passWithNoTests",
     "watch": "npm-run-all -p watch:*",
@@ -47,7 +48,7 @@
     "watch:nbextension": "webpack -w"
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^3",
+    "@jupyter-widgets/base": "^4.0.0-alpha.0",
     "@upsetjs/bundle": "^0.4.0"
   },
   "devDependencies": {

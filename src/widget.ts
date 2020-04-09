@@ -39,8 +39,11 @@ export class UpSetView extends DOMWidgetView {
   }
 
   value_changed() {
-    const props: any = this.model.toJSON({});
-    props.selection = this.model.get('value');
+    const props: any = this.model.get_state(true);
+    props.sets = [];
+    const bb = this.el.getBoundingClientRect();
+    props.width = bb.width || 300;
+    props.height = bb.height || 300;
     renderUpSet(this.el, props);
   }
 }

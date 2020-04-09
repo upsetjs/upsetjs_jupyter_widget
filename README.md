@@ -16,7 +16,7 @@ Or if you use jupyterlab:
 
 ```bash
 pip install upsetjs_jupyter_widget
-jupyter labextension install @jupyter-widgets/jupyterlab-manager
+jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0.alpha-0
 ```
 
 If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
@@ -29,7 +29,17 @@ jupyter nbextension enable --py [--sys-prefix|--user|--system] upsetjs_jupyter_w
 ## Dev Environment
 
 ```sh
-npm i
+npm i -g yarn
+yarn set version berry
+yarn
+yarn pnpify --sdk
+pipenv
+```
+
+```sh
+pipenv shell
+pip install -e .
+pipenv run jupyter labextension install .
 ```
 
 ## Commands
