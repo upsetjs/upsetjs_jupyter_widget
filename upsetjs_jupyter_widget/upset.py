@@ -12,16 +12,25 @@ from ipywidgets import (
     widget_serialization,
     Layout,
 )
+from ipywidgets.widgets.trait_types import InstanceDict
 from traitlets import default, Bool, Unicode, Enum, Dict, List, Int, Union, Float, Tuple
 from ._frontend import MODULE_NAME, MODULE_VERSION
 import typing as t
+from .model import (
+    UpSetSet,
+    T,
+    UpSetSetCombination,
+    UpSetQuery,
+    UpSetSetLike,
+    UpSetSetIntersection,
+    UpSetSetUnion,
+    UpSetSetComposite,
+)
 
 
 def sort_sets(
-    sets: t.List[t.Dict[str, t.Union[str, t.List[int], int]]],
-    order_by: str,
-    limit: t.Optional[int] = None,
-):
+    sets: t.List[UpSetSetLike[T]], order_by: str, limit: t.Optional[int] = None,
+) -> t.List[UpSetSetLike[T]]:
     if order_by == "cardinality":
         o = sorted(sets, key=lambda s: s["cardinality"], reverse=True)
     elif order_by == "degree":
@@ -34,7 +43,7 @@ def sort_sets(
 
 
 @register
-class UpSetWidget(ValueWidget, DOMWidget):
+class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     """UpSet Widget
     """
 
@@ -56,13 +65,11 @@ class UpSetWidget(ValueWidget, DOMWidget):
         Float(), Float(), default_value=(0.6, 0.4)
     ).tag(sync=True)
 
-    # # TODO data, sets
-    _elems: t.List[t.Any] = List(default_value=[]).tag(sync=True)
-    _elemToIndex: t.Dict[t.Any, int] = {}
-    _sets: t.List[t.Dict[str, t.Union[str, t.List[int], int]]] = List(
-        Dict(dict(name=Unicode(), elems=List(Int(), default_value=[]))),
-        default_value=[],
-    ).tag(sync=True)
+    elems: t.List[T] = List(default_value=[]).tag(sync=True)
+    _elemToIndex: t.Dict[T, int] = {}
+
+    _sets_obj: t.List[UpSetSet[T]] = []
+    _sets: t.List[t.Mapping] = List(Dict(), default_value=[],).tag(sync=True)
 
     combinations = Dict(
         traits=dict(
@@ -74,17 +81,13 @@ class UpSetWidget(ValueWidget, DOMWidget):
         default_value=dict(type="intersection"),
     ).tag(sync=True)
 
-    value = Union(
-        (
-            Dict(
-                traits=dict(name=Unicode(), elems=List(Int(), default_value=[])),
-                allow_none=True,
-                default_value=None,
-            ),
-            List(Int(), default_value=[]),
-        )
+    value: t.Union[t.Mapping, List[int]] = Union(
+        (Dict(), List(Int(), default_value=[]),)
     ).tag(sync=True)
-    queries = List(Dict(), default_value=[]).tag(sync=True)
+    _selection: t.Union[None, List[T], UpSetSetLike[T]] = None
+
+    _queries_obj: t.List[UpSetQuery[T]] = []
+    _queries: t.List[t.Mapping] = List(Dict(), default_value=[]).tag(sync=True)
 
     theme: str = Enum(("light", "dark"), default_value="light").tag(sync=True)
     selection_color: str = Unicode(None, allow_none=True).tag(sync=True)
@@ -116,45 +119,108 @@ class UpSetWidget(ValueWidget, DOMWidget):
     set_name: str = Unicode(None, allow_none=True).tag(sync=True)
     combination_name: str = Unicode(None, allow_none=True).tag(sync=True)
 
-    @property
-    def selection(self):
-        if self.value is None:
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.observe(self._sync_value, "value")
+
+    def _sync_value(self, evt: t.Any):
+        self._selection = self._value_to_selection(evt["new"])
+
+    def get_interact_value(self):
+        """Return the value for this widget which should be passed to
+        interactive functions. Custom widgets can change this method
+        to process the raw value ``self.value``.
+        """
+        return self.selection
+
+    def _value_to_selection(self, value):
+        if value is None:
             return None
-        if isinstance(self.value, list):
-            return [self._elems[i] for i in self.value]
-        return dict(
-            name=self.value["name"], elems=[self._elems[i] for i in self.value["elems"]]
-        )
+        if isinstance(value, list):
+            return [self.elems[i] for i in value]
+        if isinstance(value, dict):
+            typee = value.get("type", "set")
+            name = value["name"]
+            elems = [self.elems[i] for i in value.get("elems", [])]
+            sets = {self.sets[i] for i in value.get("sets", [])}
+            # look by name
+            if typee == "set":
+                return UpSetSet[T](name, elems)
+            elif typee == "intersection":
+                return UpSetSetIntersection[T](name, elems, sets)
+            elif typee == "union":
+                return UpSetSetUnion[T](name, elems, sets)
+            return UpSetSetComposite[T](name, elems, sets)
+        return None
+
+    @property
+    def selection(self) -> t.Union[None, t.List[T], UpSetSetLike[T]]:
+        return self._selection
 
     @selection.setter
-    def selection(self, value):
+    def selection(self, value: t.Union[None, t.List[T], UpSetSetLike[T]]):
+        self._selection = value
+
+        self.unobserve(self._sync_value, "value")
+
         if value is None:
             self.value = None
         elif isinstance(value, list):
             self.value = [self._elemToIndex[e] for e in value]
-        else:
-            self.value = dict(name=value, elems=[])
+        elif isinstance(value, UpSetSet):
+            self.value = dict(type="set", name=value.name, elems=[])
+        elif isinstance(value, UpSetSetIntersection):
+            self.value = dict(type="intersection", name=value.name, elems=[])
+        elif isinstance(value, UpSetSetUnion):
+            self.value = dict(type="union", name=value.name, elems=[])
+        elif isinstance(value, UpSetSetComposite):
+            self.value = dict(type="composite", name=value.name, elems=[])
+        # unknown
+        self.observe(self._sync_value, "value")
+
+    @property
+    def sets(self) -> t.List[UpSetSet[T]]:
+        return self._sets_obj
+
+    @sets.setter
+    def sets(self, value: t.List[UpSetSet[T]]):
+        self._sets_obj = value
+        self._sets = [
+            dict(type="set", name=s.name, elems=[self._elemToIndex[e] for e in s.elems])
+            for s in self._sets_obj
+        ]
 
     def on_selection_changed(self, callback):
-        self.observe(lambda evt: callback(evt.new), "value")
+        self.observe(lambda: callback(self.selection), "value")
 
     def append_query(
         self,
         name: str,
         color: str,
-        set: t.Optional[str] = None,
-        elems: t.Optional[t.List[t.Any]] = None,
-    ):
-        q: t.Dict[str, t.Any] = dict(name=name, color=color)
+        set: t.Optional[UpSetSetLike[T]] = None,
+        elems: t.Optional[t.List[T]] = None,
+    ) -> "UpSetWidget":
+        q: UpSetQuery[T]
         if set is not None:
-            q["set"] = set
+            q = UpSetQuery[T](name, color, set=set.name)
         else:
-            q["elems"] = elems or []
-        self.queries.append(q)
+            q = UpSetQuery[T](name, color, elems=elems or [])
+        self._queries_obj.append(q)
+        qs = dict(name=q.name, color=q.color)
+        if q.set:
+            qs["set"] = q.set.name
+        else:
+            qs["elems"] = [self._elemToIndex[e] for e in q.elems]
+        self._queries.append(qs)
         return self
 
+    @property
+    def queries(self):
+        self._queries_obj
+
     def clear_queries(self):
-        self.queries = []
+        self._queries = []
+        self._queries_obj = []
 
     @default("layout")
     def _default_layout(self):
@@ -162,19 +228,17 @@ class UpSetWidget(ValueWidget, DOMWidget):
 
     def from_list(
         self,
-        sets: t.Dict[str, t.List[t.Any]],
+        sets: t.Dict[str, t.List[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
-    ):
-        elems: t.Set[t.Any] = set()
+    ) -> "UpSetWidget":
+        elems: t.Set[T] = set()
         for s in sets.values():
             elems.update(s)
-        self._elems = list(elems)
-        self._elemToIndex = {e: i for i, e in enumerate(self._elems)}
+        self.elems = list(elems)
+        self._elemToIndex = {e: i for i, e in enumerate(self.elems)}
 
-        self._sets = [
-            dict(name=k, elems=[self._elemToIndex[vi] for vi in v], cardinality=len(v))
-            for k, v in sets.items()
-        ]
-        self._sets = sort_sets(self._sets, order_by, limit)
+        base_sets = [UpSetSet[T](name=k, elems=v) for k, v in sets.items()]
+        self.sets = sort_sets(base_sets, order_by, limit)
         self.combinations["order"] = order_by
+        return self

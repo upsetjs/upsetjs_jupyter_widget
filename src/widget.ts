@@ -58,6 +58,8 @@ export class UpSetView extends DOMWidgetView {
           }
         : null
     );
+    this.props.selection = s;
+    this.renderImpl();
     this.touch();
     this.model.on('change', this.changed_prop, this);
   };
@@ -83,7 +85,7 @@ export class UpSetView extends DOMWidgetView {
       if (
         v == null ||
         (Array.isArray(v) && v.length === 0) ||
-        (key.startsWith('_') && key !== '_elems' && key !== '_sets') ||
+        (key.startsWith('_') && key !== '_queries' && key !== '_sets') ||
         key === 'layout'
       ) {
         return;
