@@ -4,27 +4,21 @@
 UpSet.js Jupyter Widget
 """
 
-from ipywidgets import (
-    ValueWidget,
-    Layout,
-    DOMWidget,
-    register,
-    widget_serialization,
-    Layout,
-)
-from ipywidgets.widgets.trait_types import InstanceDict
-from traitlets import default, Bool, Unicode, Enum, Dict, List, Int, Union, Float, Tuple
-from ._frontend import MODULE_NAME, MODULE_VERSION
 import typing as t
+
+from ipywidgets import DOMWidget, Layout, ValueWidget, register
+from traitlets import Bool, Dict, Enum, Float, Int, List, Tuple, Unicode, Union, default
+
+from ._frontend import MODULE_NAME, MODULE_VERSION
 from .model import (
-    UpSetSet,
     T,
-    UpSetSetCombination,
     UpSetQuery,
-    UpSetSetLike,
-    UpSetSetIntersection,
-    UpSetSetUnion,
+    UpSetSet,
+    UpSetSetCombination,
     UpSetSetComposite,
+    UpSetSetIntersection,
+    UpSetSetLike,
+    UpSetSetUnion,
 )
 
 
@@ -148,9 +142,9 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
             # look by name
             if typee == "set":
                 return UpSetSet[T](name, elems)
-            elif typee == "intersection":
+            if typee == "intersection":
                 return UpSetSetIntersection[T](name, elems, sets)
-            elif typee == "union":
+            if typee == "union":
                 return UpSetSetUnion[T](name, elems, sets)
             return UpSetSetComposite[T](name, elems, sets)
         return None
@@ -227,7 +221,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
 
     @property
     def queries(self):
-        self._queries_obj
+        return self._queries_obj
 
     def clear_queries(self):
         self._queries = []

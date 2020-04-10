@@ -114,6 +114,7 @@ class UpSetQuery(t.Generic[T]):
         super().__init__()
         self.type = type
         self.name = name
+        self.color = color
         self.set = set
         self.elems = elems
 

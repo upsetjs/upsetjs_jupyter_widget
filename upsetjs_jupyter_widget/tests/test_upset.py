@@ -12,4 +12,4 @@ def test_upset_creation_blank():
     test case
     """
     widget = UpSetWidget()
-    assert widget.value == "Test"
+    assert widget.value is None
