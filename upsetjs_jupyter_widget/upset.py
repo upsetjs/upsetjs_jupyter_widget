@@ -20,6 +20,7 @@ from .model import (
     UpSetSetLike,
     UpSetSetUnion,
 )
+from .generate import generate_unions, generate_intersections
 
 
 def sort_sets(
@@ -66,15 +67,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     _sets_obj: t.List[UpSetSet[T]] = []
     _sets: t.List[t.Mapping] = List(Dict(), default_value=[],).tag(sync=True)
 
-    combinations = Dict(
-        traits=dict(
-            type=Enum(("intersection", "union"), default_value="intersection"),
-            min=Int(None, allow_none=True),
-            max=Int(None, allow_none=True),
-            empty=Bool(False),
-        ),
-        default_value=dict(type="intersection"),
-    ).tag(sync=True)
+    _combinations_obj: t.List[UpSetSetCombination[T]] = []
+    _combinations: t.List[t.Mapping] = List(Dict(), default_value=[],).tag(sync=True)
 
     value: t.Union[None, t.Mapping, t.List[int]] = Union(
         (Dict(allow_none=True, default_value=None), List(Int(), default_value=[]))
@@ -132,14 +126,31 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         if value is None:
             return None
         if isinstance(value, list):
-            return [self.elems[i] for i in value]
+            return frozenset([self.elems[i] for i in value])
         if isinstance(value, dict):
             typee = value.get("type", "set")
             name = value["name"]
+
+            if typee == "set":
+                r = next((s for s in self.sets if s.name == name), None)
+                if r:
+                    return r
+            else:
+                r = next(
+                    (
+                        s
+                        for s in self.combinations
+                        if s.name == name and str(s.type) == typee
+                    ),
+                    None,
+                )
+                if r:
+                    return r
+
+            # generate since not found
             elems = frozenset(self.elems[i] for i in value.get("elems", []))
             setByName = {s.name: s for s in self.sets}
             sets = frozenset(setByName[n] for n in value.get("set_names", []))
-            # look by name
             if typee == "set":
                 return UpSetSet[T](name, elems)
             if typee == "intersection":
@@ -168,13 +179,12 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         ):
             self.value = [self._elemToIndex[e] for e in value]
         elif isinstance(value, UpSetSet):
-            self.value = dict(type="set", name=value.name, elems=[])
-        elif isinstance(value, UpSetSetIntersection):
-            self.value = dict(type="intersection", name=value.name, elems=[])
-        elif isinstance(value, UpSetSetUnion):
-            self.value = dict(type="union", name=value.name, elems=[])
-        elif isinstance(value, UpSetSetComposite):
-            self.value = dict(type="composite", name=value.name, elems=[])
+            self.value = dict(type="set", name=value.name)
+        else:
+            assert isinstance(
+                value, (UpSetSetIntersection, UpSetSetUnion, UpSetSetComposite)
+            )
+            self.value = dict(type=str(value.type), name=value.name)
         # unknown
         self.observe(self._sync_value, "value")
 
@@ -187,12 +197,31 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self._sets_obj = value
         self._sets = [
             dict(
-                type="set",
+                type=str(s.type),
                 name=s.name,
                 cardinality=s.cardinality,
                 elems=[self._elemToIndex[e] for e in s.elems],
             )
             for s in self._sets_obj
+        ]
+
+    @property
+    def combinations(self) -> t.Sequence[UpSetSetCombination[T]]:
+        return self._combinations_obj
+
+    @combinations.setter
+    def combinations(self, value: t.List[UpSetSetCombination[T]]):
+        self._combinations_obj = value
+        self._combinations = [
+            dict(
+                type=str(s.type),
+                name=s.name,
+                cardinality=s.cardinality,
+                degree=s.degree,
+                set_names=[c.name for c in s.sets],
+                elems=[self._elemToIndex[e] for e in s.elems],
+            )
+            for s in self._combinations_obj
         ]
 
     def on_selection_changed(self, callback):
@@ -213,7 +242,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self._queries_obj.append(q)
         qs: t.Dict = dict(name=q.name, color=q.color)
         if q.set:
-            qs["set"] = q.set.name
+            qs["set"] = dict(name=q.set.name, type=str(q.set.type))
         else:
             qs["elems"] = [self._elemToIndex[e] for e in q.elems or []]
         self._queries.append(qs)
@@ -247,5 +276,30 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
             UpSetSet[T](name=k, elems=frozenset(v)) for k, v in sets.items()
         ]
         self.sets = t.cast(t.Any, sort_sets(base_sets, order_by, limit))
-        self.combinations["order"] = order_by
+        return self.generate_intersections(order_by=order_by)
+
+    def generate_intersections(
+        self,
+        min: int = 0,
+        max: t.Optional[int] = None,
+        empty: bool = False,
+        order_by: str = "cardinality",
+        limit: t.Optional[int] = None,
+    ):
+        c = generate_intersections(self.sets, min, max, empty, self.elems)
+
+        self.combinations = t.cast(t.Any, sort_sets(c, order_by, limit))
+        return self
+
+    def generate_unions(
+        self,
+        min: int = 0,
+        max: t.Optional[int] = None,
+        empty: bool = False,
+        order_by: str = "cardinality",
+        limit: t.Optional[int] = None,
+    ):
+        c = generate_unions(self.sets, min, max, empty, self.elems)
+
+        self.combinations = t.cast(t.Any, sort_sets(c, order_by, limit))
         return self

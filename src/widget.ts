@@ -146,23 +146,18 @@ export class UpSetView extends DOMWidgetView {
       }
     }
     if (delta.selection) {
-      if (typeof delta.selection.name === 'string' || Array.isArray(delta.selection)) {
-        props.selection = resolveSet(
-          Array.isArray(delta.selection) ? delta.selection : delta.selection.name,
-          props.sets,
-          props.combinations as ISetCombinations<any>
-        );
-      } else {
-        props.selection = Object.assign({}, delta.selection, {
-          elems: delta.selection.elems.map((e: any) => this.elemToIndex.get(e)),
-        });
-      }
+      props.selection = resolveSet(
+        delta.selection,
+        props.sets,
+        props.combinations as ISetCombinations<any>,
+        this.elems
+      );
     }
     if (delta.queries) {
       props.queries = delta.queries.map((query: UpSetQuery<any>) => {
-        if (isSetQuery(query) && (typeof query.set === 'string' || Array.isArray(query.set))) {
+        if (isSetQuery(query)) {
           return Object.assign({}, query, {
-            set: resolveSet(query.set, props.sets, props.combinations as ISetCombinations<any>)!,
+            set: resolveSet(query.set, props.sets, props.combinations as ISetCombinations<any>, this.elems)!,
           });
         } else if (isElemQuery(query)) {
           return Object.assign({}, query, {

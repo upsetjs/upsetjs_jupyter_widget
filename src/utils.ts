@@ -1,6 +1,4 @@
 import {
-  ISetLike,
-  ISetCombination,
   asSets,
   asCombinations,
   generateCombinations,
@@ -53,36 +51,21 @@ export function fixCombinations(
   );
 }
 
-function toUnifiedCombinationName(c: ISetCombination<any>) {
-  return Array.from(c.sets)
-    .map((s) => s.name)
-    .sort()
-    .join('&');
-}
-
-export function resolveSet(set: string | string[], sets: ISets<any>, combinations: ISetCombinations<any>) {
-  const s = sets.find((s) => s.name === set);
-  if (s) {
-    return s;
+export function resolveSet(
+  set: number[] | { name: string; type: string },
+  sets: ISets<any>,
+  combinations: ISetCombinations<any>,
+  elems: any[]
+) {
+  if (Array.isArray(set)) {
+    return set.map((i) => elems[i]);
   }
-  const combinedNames = Array.isArray(set) ? set.slice().sort().join('&') : null;
-  return combinations.find((c) => {
-    return c.name === set || (combinedNames && combinedNames === toUnifiedCombinationName(c));
-  });
-}
-
-export function resolveSetByElems(elems: ReadonlyArray<any>, sets: ISets<any>, combinations: ISetCombinations<any>) {
-  const set = new Set(elems);
-  const sameElems = (s: ISetLike<any>) => {
-    if (!s.elems || s.elems.length !== set.size) {
-      return false;
+  const ss: { name: string; type: string } = set;
+  if (!ss.type || ss.type === 'set') {
+    const s = sets.find((s) => s.name === ss.name);
+    if (s) {
+      return s;
     }
-    return s.elems.every((v) => set.has(v));
-  };
-
-  const r = sets.find(sameElems);
-  if (r) {
-    return r;
   }
-  return combinations.find(sameElems);
+  return combinations.find((c) => c.name === ss.name);
 }

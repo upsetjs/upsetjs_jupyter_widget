@@ -10,6 +10,15 @@ class UpSetSetType(Enum):
     UNION = "union"
     COMPOSITE = "composite"
 
+    def __str__(self):
+        if self == UpSetSetType.SET:
+            return "set"
+        elif self == UpSetSetType.INTERSECTION:
+            return "intersection"
+        elif self == UpSetSetType.UNION:
+            return "union"
+        return "composite"
+
 
 class UpSetBaseSet(t.Generic[T]):
     type: UpSetSetType
