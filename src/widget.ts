@@ -48,6 +48,7 @@ export class UpSetView extends DOMWidgetView {
   }
 
   private changeSelection = (s: ISetLike<any> | null) => {
+    this.model.off('change', this.changed_prop, null);
     this.model.set(
       'value',
       s
@@ -57,6 +58,8 @@ export class UpSetView extends DOMWidgetView {
           }
         : null
     );
+    this.touch();
+    this.model.on('change', this.changed_prop, this);
   };
 
   private stateToProps(): Partial<UpSetProps<any>> {
@@ -126,12 +129,17 @@ export class UpSetView extends DOMWidgetView {
         props.combinations = c;
       }
     }
-    if ((delta.selection && typeof delta.selection.name === 'string') || Array.isArray(delta.selection)) {
-      props.selection = resolveSet(
-        Array.isArray(delta.selection) ? delta.selection : delta.selection.name,
-        props.sets,
-        props.combinations as ISetCombinations<any>
-      );
+    if (delta.selection) {
+      if (typeof delta.selection.name === 'string' || Array.isArray(delta.selection)) {
+        props.selection = resolveSet(
+          Array.isArray(delta.selection) ? delta.selection : delta.selection.name,
+          props.sets,
+          props.combinations as ISetCombinations<any>
+        );
+      } else {
+        const s: any = props.selection;
+        s.elems = s.elems.map((e: any) => this.elemToIndex.get(e));
+      }
     }
     if (delta.queries) {
       props.queries!.forEach((query) => {
@@ -152,24 +160,25 @@ export class UpSetView extends DOMWidgetView {
     }
   }
 
-  private changed_prop(evt: any) {
-    console.log(evt);
+  private changed_prop(model: any, options: any) {
+    console.log(model, options);
   }
 
   private renderImpl() {
     const bb = this.el.getBoundingClientRect();
+    const p = Object.assign({}, this.props);
 
     if (!bb.width || !bb.height) {
       requestAnimationFrame(() => {
         const bb2 = this.el.getBoundingClientRect();
-        this.props.width = bb2.width || 600;
-        this.props.height = bb2.height || 400;
-        renderUpSet(this.el, this.props);
+        p.width = bb2.width || 600;
+        p.height = bb2.height || 400;
+        renderUpSet(this.el, p);
       });
       return;
     }
-    this.props.width = bb.width;
-    this.props.height = bb.height;
-    renderUpSet(this.el, this.props);
+    p.width = bb.width;
+    p.height = bb.height;
+    renderUpSet(this.el, p);
   }
 }
