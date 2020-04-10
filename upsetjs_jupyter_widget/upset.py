@@ -260,7 +260,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     def _default_layout(self):
         return Layout(height="400px", align_self="stretch")
 
-    def from_list(
+    def from_dict(
         self,
         sets: t.Dict[str, t.Sequence[T]],
         order_by: str = "cardinality",
@@ -275,6 +275,20 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         base_sets: t.List[UpSetSet[T]] = [
             UpSetSet[T](name=k, elems=frozenset(v)) for k, v in sets.items()
         ]
+        self.sets = t.cast(t.Any, sort_sets(base_sets, order_by, limit))
+        return self.generate_intersections(order_by=order_by)
+
+    def from_dataframe(
+        self, df: t.Any, order_by: str = "cardinality", limit: t.Optional[int] = None,
+    ):
+        self.elems = sorted(df.index)
+        self._elemToIndex = {e: i for i, e in enumerate(self.elems)}
+
+        def to_set(name: str, series):
+            elems = series[series.astype(bool)].index
+            return UpSetSet[T](name=name, elems=frozenset(elems))
+
+        base_sets = [to_set(name, series) for name, series in df.items()]
         self.sets = t.cast(t.Any, sort_sets(base_sets, order_by, limit))
         return self.generate_intersections(order_by=order_by)
 
