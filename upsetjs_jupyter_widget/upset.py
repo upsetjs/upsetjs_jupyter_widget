@@ -187,7 +187,12 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     def sets(self, value: t.List[UpSetSet[T]]):
         self._sets_obj = value
         self._sets = [
-            dict(type="set", name=s.name, elems=[self._elemToIndex[e] for e in s.elems])
+            dict(
+                type="set",
+                name=s.name,
+                cardinality=s.cardinality,
+                elems=[self._elemToIndex[e] for e in s.elems],
+            )
             for s in self._sets_obj
         ]
 

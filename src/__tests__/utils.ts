@@ -45,9 +45,8 @@ export class MockComm {
   _on_close: Function | null = null;
 }
 
-export class DummyManager extends widgets.ManagerBase<HTMLElement> {
+export class DummyManager {
   constructor() {
-    super();
     this.el = window.document.createElement('div');
   }
 
