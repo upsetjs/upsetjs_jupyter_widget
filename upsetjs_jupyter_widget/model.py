@@ -38,7 +38,7 @@ class UpSetSet(UpSetBaseSet[T]):
         return 1
 
     def __repr__(self):
-        return f"UpSetSet(name={self.name}, elems={self.elems})"
+        return f"UpSetSet(name={self.name}, elems={set(self.elems)})"
 
 
 class UpSetSetCombination(UpSetBaseSet[T]):
@@ -59,7 +59,8 @@ class UpSetSetCombination(UpSetBaseSet[T]):
         return len(self.sets)
 
     def __repr__(self):
-        return f"{self.__class__.name}(name={self.name}, sets={self.sets}, elems={self.elems})"
+        set_names = {s.name for s in self.sets}
+        return f"{self.__class__.__name__}(name={self.name}, sets={set_names}, elems={set(self.elems)})"
 
 
 class UpSetSetIntersection(UpSetSetCombination[T]):
@@ -121,6 +122,4 @@ class UpSetQuery(t.Generic[T]):
             return (
                 f"UpSetSetQuery(name={self.name}, color={self.color}, set={self.set})"
             )
-        return (
-            f"UpSetSetQuery(name={self.name}, color={self.color}, elems={self.elems})"
-        )
+        return f"UpSetSetQuery(name={self.name}, color={self.color}, elems={set(self.elems)})"
