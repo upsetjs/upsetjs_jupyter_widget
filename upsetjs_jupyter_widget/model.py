@@ -11,10 +11,18 @@ class UpSetSetType(Enum):
     COMPOSITE = "composite"
 
 
-class UpSetBaseSet(t.Generic[T], t.NamedTuple):
+class UpSetBaseSet(t.Generic[T]):
     type: UpSetSetType
     name: str
-    elems: t.List[T]
+    elems: t.Sequence[T]
+
+    def __init__(
+        self, type: UpSetSetType, name: str, elems: t.Optional[t.Sequence[T]] = None
+    ):
+        super().__init__()
+        self.type = type
+        self.name = name
+        self.elems = elems or []
 
     @property
     def cardinality(self):
@@ -22,8 +30,15 @@ class UpSetBaseSet(t.Generic[T], t.NamedTuple):
 
 
 class UpSetSet(UpSetBaseSet[T]):
-    def __init__(self, name: str = "", elems: t.Optional[t.List[T]] = None):
+    def __init__(self, name: str = "", elems: t.Optional[t.Sequence[T]] = None):
         super().__init__(UpSetSetType.SET, name, elems)
+
+    @property
+    def degree(self):
+        return 1
+
+    def __repr__(self):
+        return f"UpSetSet(name={self.name}, elems={self.elems})"
 
 
 class UpSetSetCombination(UpSetBaseSet[T]):
@@ -33,7 +48,7 @@ class UpSetSetCombination(UpSetBaseSet[T]):
         self,
         type: UpSetSetType,
         name: str = "",
-        elems: t.Optional[t.List[T]] = None,
+        elems: t.Optional[t.Sequence[T]] = None,
         sets: t.Optional[t.Set[UpSetSet[T]]] = None,
     ):
         super().__init__(type, name, elems)
@@ -43,12 +58,15 @@ class UpSetSetCombination(UpSetBaseSet[T]):
     def degree(self):
         return len(self.sets)
 
+    def __repr__(self):
+        return f"{self.__class__.name}(name={self.name}, sets={self.sets}, elems={self.elems})"
+
 
 class UpSetSetIntersection(UpSetSetCombination[T]):
     def __init__(
         self,
         name: str = "",
-        elems: t.Optional[t.List[T]] = None,
+        elems: t.Optional[t.Sequence[T]] = None,
         sets: t.Optional[t.Set[UpSetSet[T]]] = None,
     ):
         super().__init__(UpSetSetType.INTERSECTION, name, elems, sets)
@@ -58,7 +76,7 @@ class UpSetSetUnion(UpSetSetCombination[T]):
     def __init__(
         self,
         name: str = "",
-        elems: t.Optional[t.List[T]] = None,
+        elems: t.Optional[t.Sequence[T]] = None,
         sets: t.Optional[t.Set[UpSetSet[T]]] = None,
     ):
         super().__init__(UpSetSetType.UNION, name, elems, sets)
@@ -68,7 +86,7 @@ class UpSetSetComposite(UpSetSetCombination[T]):
     def __init__(
         self,
         name: str = "",
-        elems: t.Optional[t.List[T]] = None,
+        elems: t.Optional[t.Sequence[T]] = None,
         sets: t.Optional[t.Set[UpSetSet[T]]] = None,
     ):
         super().__init__(UpSetSetType.COMPOSITE, name, elems, sets)
@@ -79,8 +97,30 @@ UpSetSetLike = t.Union[
 ]
 
 
-class UpSetQuery(t.NamedTuple, t.Generic[T]):
+class UpSetQuery(t.Generic[T]):
     name: str
     color: str
     set: t.Optional[UpSetSetLike[T]]
-    elems: t.Optional[t.List[T]]
+    elems: t.Optional[t.Sequence[T]]
+
+    def __init__(
+        self,
+        name: str,
+        color: str,
+        set: t.Optional[UpSetSetLike[T]] = None,
+        elems: t.Optional[t.Sequence[T]] = None,
+    ):
+        super().__init__()
+        self.type = type
+        self.name = name
+        self.set = set
+        self.elems = elems
+
+    def __repr__(self):
+        if self.set:
+            return (
+                f"UpSetSetQuery(name={self.name}, color={self.color}, set={self.set})"
+            )
+        return (
+            f"UpSetSetQuery(name={self.name}, color={self.color}, elems={self.elems})"
+        )

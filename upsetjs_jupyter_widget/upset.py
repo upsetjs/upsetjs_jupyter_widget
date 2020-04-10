@@ -29,14 +29,15 @@ from .model import (
 
 
 def sort_sets(
-    sets: t.List[UpSetSetLike[T]], order_by: str, limit: t.Optional[int] = None,
+    sets: t.Sequence[UpSetSetLike[T]], order_by: str, limit: t.Optional[int] = None,
 ) -> t.List[UpSetSetLike[T]]:
+    o: t.List[UpSetSetLike[T]]
     if order_by == "cardinality":
-        o = sorted(sets, key=lambda s: s["cardinality"], reverse=True)
+        o = sorted(sets, key=lambda s: s.cardinality, reverse=True)
     elif order_by == "degree":
-        o = sorted(sets, key=lambda s: s["degree"], reverse=True)
+        o = sorted(sets, key=lambda s: s.degree, reverse=True)
     else:
-        o = sets
+        o = list(sets)
     if limit is not None:
         return o[:limit]
     return o
@@ -81,10 +82,10 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         default_value=dict(type="intersection"),
     ).tag(sync=True)
 
-    value: t.Union[t.Mapping, List[int]] = Union(
-        (Dict(), List(Int(), default_value=[]),)
+    value: t.Union[None, t.Mapping, t.List[int]] = Union(
+        (Dict(allow_none=True, default_value=None), List(Int(), default_value=[]))
     ).tag(sync=True)
-    _selection: t.Union[None, List[T], UpSetSetLike[T]] = None
+    _selection: t.Union[None, t.Sequence[T], UpSetSetLike[T]] = None
 
     _queries_obj: t.List[UpSetQuery[T]] = []
     _queries: t.List[t.Mapping] = List(Dict(), default_value=[]).tag(sync=True)
@@ -154,11 +155,11 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         return None
 
     @property
-    def selection(self) -> t.Union[None, t.List[T], UpSetSetLike[T]]:
+    def selection(self) -> t.Union[None, t.Sequence[T], UpSetSetLike[T]]:
         return self._selection
 
     @selection.setter
-    def selection(self, value: t.Union[None, t.List[T], UpSetSetLike[T]]):
+    def selection(self, value: t.Union[None, t.Sequence[T], UpSetSetLike[T]]):
         self._selection = value
 
         self.unobserve(self._sync_value, "value")
@@ -179,7 +180,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self.observe(self._sync_value, "value")
 
     @property
-    def sets(self) -> t.List[UpSetSet[T]]:
+    def sets(self) -> t.Sequence[UpSetSet[T]]:
         return self._sets_obj
 
     @sets.setter
@@ -198,19 +199,19 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         name: str,
         color: str,
         set: t.Optional[UpSetSetLike[T]] = None,
-        elems: t.Optional[t.List[T]] = None,
+        elems: t.Optional[t.Sequence[T]] = None,
     ) -> "UpSetWidget":
         q: UpSetQuery[T]
         if set is not None:
-            q = UpSetQuery[T](name, color, set=set.name)
+            q = UpSetQuery[T](name, color, set=set)
         else:
             q = UpSetQuery[T](name, color, elems=elems or [])
         self._queries_obj.append(q)
-        qs = dict(name=q.name, color=q.color)
+        qs: t.Dict = dict(name=q.name, color=q.color)
         if q.set:
             qs["set"] = q.set.name
         else:
-            qs["elems"] = [self._elemToIndex[e] for e in q.elems]
+            qs["elems"] = [self._elemToIndex[e] for e in q.elems or []]
         self._queries.append(qs)
         return self
 
@@ -228,17 +229,19 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
 
     def from_list(
         self,
-        sets: t.Dict[str, t.List[T]],
+        sets: t.Dict[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
     ) -> "UpSetWidget":
         elems: t.Set[T] = set()
         for s in sets.values():
             elems.update(s)
-        self.elems = list(elems)
+        self.elems = sorted(elems)
         self._elemToIndex = {e: i for i, e in enumerate(self.elems)}
 
-        base_sets = [UpSetSet[T](name=k, elems=v) for k, v in sets.items()]
-        self.sets = sort_sets(base_sets, order_by, limit)
+        base_sets: t.List[UpSetSet[T]] = [
+            UpSetSet[T](name=k, elems=v) for k, v in sets.items()
+        ]
+        self.sets = t.cast(t.Any, sort_sets(base_sets, order_by, limit))
         self.combinations["order"] = order_by
         return self

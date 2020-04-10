@@ -3,7 +3,15 @@
 import { DOMWidgetModel, DOMWidgetView, ISerializers } from '@jupyter-widgets/base';
 
 import { MODULE_NAME, MODULE_VERSION } from './version';
-import { isElemQuery, ISetCombinations, ISetLike, isSetQuery, renderUpSet, UpSetProps } from '@upsetjs/bundle';
+import {
+  isElemQuery,
+  ISetCombinations,
+  ISetLike,
+  isSetQuery,
+  renderUpSet,
+  UpSetProps,
+  UpSetQuery,
+} from '@upsetjs/bundle';
 import { fixCombinations, fixSets, resolveSet } from './utils';
 
 export class UpSetModel extends DOMWidgetModel {
@@ -139,17 +147,23 @@ export class UpSetView extends DOMWidgetView {
           props.combinations as ISetCombinations<any>
         );
       } else {
-        const s: any = props.selection;
-        s.elems = s.elems.map((e: any) => this.elemToIndex.get(e));
+        props.selection = Object.assign({}, delta.selection, {
+          elems: delta.selection.elems.map((e: any) => this.elemToIndex.get(e)),
+        });
       }
     }
     if (delta.queries) {
-      props.queries!.forEach((query) => {
+      props.queries = delta.queries.map((query: UpSetQuery<any>) => {
         if (isSetQuery(query) && (typeof query.set === 'string' || Array.isArray(query.set))) {
-          query.set = resolveSet(query.set, props.sets, props.combinations as ISetCombinations<any>)!;
+          return Object.assign({}, query, {
+            set: resolveSet(query.set, props.sets, props.combinations as ISetCombinations<any>)!,
+          });
         } else if (isElemQuery(query)) {
-          query.elems = Array.from(query.elems).map((i) => this.elems[i]);
+          return Object.assign({}, query, {
+            elems: Array.from(query.elems).map((i) => this.elems[i]),
+          });
         }
+        return query;
       });
     }
 

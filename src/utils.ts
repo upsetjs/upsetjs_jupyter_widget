@@ -14,10 +14,11 @@ export function fixSets(sets: ISets<any>, elems: any[]) {
     return [];
   }
   return asSets(
-    sets.map((set) => {
-      (set as any).elems = set.elems.map((i) => elems[i]);
-      return set;
-    })
+    sets.map((set) =>
+      Object.assign({}, set, {
+        elems: set.elems.map((i) => elems[i]),
+      })
+    )
   );
 }
 
@@ -42,10 +43,11 @@ export function fixCombinations(
   }
   const lookup = new Map(sets.map((s) => [s.name, s]));
   return asCombinations(
-    combinations.map((set) => {
-      (set as any).elems = set.elems.map((i: number) => elems[i]);
-      return set;
-    }),
+    combinations.map((set) =>
+      Object.assign({}, set, {
+        elems: set.elems.map((i: number) => elems[i]),
+      })
+    ),
     'composite',
     (s: any) => s.set_names.map((si: string) => lookup.get(si)).filter(Boolean)
   );
