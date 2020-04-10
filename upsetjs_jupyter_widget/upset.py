@@ -85,7 +85,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     value: t.Union[None, t.Mapping, t.List[int]] = Union(
         (Dict(allow_none=True, default_value=None), List(Int(), default_value=[]))
     ).tag(sync=True)
-    _selection: t.Union[None, t.Sequence[T], UpSetSetLike[T]] = None
+    _selection: t.Union[None, t.FrozenSet[T], UpSetSetLike[T]] = None
 
     _queries_obj: t.List[UpSetQuery[T]] = []
     _queries: t.List[t.Mapping] = List(Dict(), default_value=[]).tag(sync=True)
@@ -142,8 +142,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         if isinstance(value, dict):
             typee = value.get("type", "set")
             name = value["name"]
-            elems = [self.elems[i] for i in value.get("elems", [])]
-            sets = {self.sets[i] for i in value.get("sets", [])}
+            elems = frozenset(self.elems[i] for i in value.get("elems", []))
+            sets = frozenset(self.sets[i] for i in value.get("sets", []))
             # look by name
             if typee == "set":
                 return UpSetSet[T](name, elems)
@@ -155,18 +155,22 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         return None
 
     @property
-    def selection(self) -> t.Union[None, t.Sequence[T], UpSetSetLike[T]]:
+    def selection(self) -> t.Union[None, t.FrozenSet[T], UpSetSetLike[T]]:
         return self._selection
 
     @selection.setter
-    def selection(self, value: t.Union[None, t.Sequence[T], UpSetSetLike[T]]):
+    def selection(self, value: t.Union[None, t.FrozenSet[T], UpSetSetLike[T]]):
         self._selection = value
 
         self.unobserve(self._sync_value, "value")
 
         if value is None:
             self.value = None
-        elif isinstance(value, list):
+        elif (
+            isinstance(value, list)
+            or isinstance(value, set)
+            or isinstance(value, frozenset)
+        ):
             self.value = [self._elemToIndex[e] for e in value]
         elif isinstance(value, UpSetSet):
             self.value = dict(type="set", name=value.name, elems=[])
@@ -204,13 +208,13 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         name: str,
         color: str,
         set: t.Optional[UpSetSetLike[T]] = None,
-        elems: t.Optional[t.Sequence[T]] = None,
+        elems: t.Optional[t.FrozenSet[T]] = None,
     ) -> "UpSetWidget":
         q: UpSetQuery[T]
         if set is not None:
             q = UpSetQuery[T](name, color, set=set)
         else:
-            q = UpSetQuery[T](name, color, elems=elems or [])
+            q = UpSetQuery[T](name, color, elems=elems or frozenset())
         self._queries_obj.append(q)
         qs: t.Dict = dict(name=q.name, color=q.color)
         if q.set:
@@ -245,7 +249,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self._elemToIndex = {e: i for i, e in enumerate(self.elems)}
 
         base_sets: t.List[UpSetSet[T]] = [
-            UpSetSet[T](name=k, elems=v) for k, v in sets.items()
+            UpSetSet[T](name=k, elems=frozenset(v)) for k, v in sets.items()
         ]
         self.sets = t.cast(t.Any, sort_sets(base_sets, order_by, limit))
         self.combinations["order"] = order_by

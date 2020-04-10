@@ -14,15 +14,15 @@ class UpSetSetType(Enum):
 class UpSetBaseSet(t.Generic[T]):
     type: UpSetSetType
     name: str
-    elems: t.Sequence[T]
+    elems: t.FrozenSet[T]
 
     def __init__(
-        self, type: UpSetSetType, name: str, elems: t.Optional[t.Sequence[T]] = None
+        self, type: UpSetSetType, name: str, elems: t.Optional[t.FrozenSet[T]] = None
     ):
         super().__init__()
         self.type = type
         self.name = name
-        self.elems = elems or []
+        self.elems = elems or frozenset()
 
     @property
     def cardinality(self):
@@ -30,7 +30,7 @@ class UpSetBaseSet(t.Generic[T]):
 
 
 class UpSetSet(UpSetBaseSet[T]):
-    def __init__(self, name: str = "", elems: t.Optional[t.Sequence[T]] = None):
+    def __init__(self, name: str = "", elems: t.Optional[t.FrozenSet[T]] = None):
         super().__init__(UpSetSetType.SET, name, elems)
 
     @property
@@ -42,17 +42,17 @@ class UpSetSet(UpSetBaseSet[T]):
 
 
 class UpSetSetCombination(UpSetBaseSet[T]):
-    sets: t.Set[UpSetSet[T]]
+    sets: t.FrozenSet[UpSetSet[T]]
 
     def __init__(
         self,
         type: UpSetSetType,
         name: str = "",
-        elems: t.Optional[t.Sequence[T]] = None,
-        sets: t.Optional[t.Set[UpSetSet[T]]] = None,
+        elems: t.Optional[t.FrozenSet[T]] = None,
+        sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
     ):
         super().__init__(type, name, elems)
-        self.sets = sets or set()
+        self.sets = sets or frozenset()
 
     @property
     def degree(self):
@@ -66,8 +66,8 @@ class UpSetSetIntersection(UpSetSetCombination[T]):
     def __init__(
         self,
         name: str = "",
-        elems: t.Optional[t.Sequence[T]] = None,
-        sets: t.Optional[t.Set[UpSetSet[T]]] = None,
+        elems: t.Optional[t.FrozenSet[T]] = None,
+        sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
     ):
         super().__init__(UpSetSetType.INTERSECTION, name, elems, sets)
 
@@ -76,8 +76,8 @@ class UpSetSetUnion(UpSetSetCombination[T]):
     def __init__(
         self,
         name: str = "",
-        elems: t.Optional[t.Sequence[T]] = None,
-        sets: t.Optional[t.Set[UpSetSet[T]]] = None,
+        elems: t.Optional[t.FrozenSet[T]] = None,
+        sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
     ):
         super().__init__(UpSetSetType.UNION, name, elems, sets)
 
@@ -86,8 +86,8 @@ class UpSetSetComposite(UpSetSetCombination[T]):
     def __init__(
         self,
         name: str = "",
-        elems: t.Optional[t.Sequence[T]] = None,
-        sets: t.Optional[t.Set[UpSetSet[T]]] = None,
+        elems: t.Optional[t.FrozenSet[T]] = None,
+        sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
     ):
         super().__init__(UpSetSetType.COMPOSITE, name, elems, sets)
 
@@ -101,14 +101,14 @@ class UpSetQuery(t.Generic[T]):
     name: str
     color: str
     set: t.Optional[UpSetSetLike[T]]
-    elems: t.Optional[t.Sequence[T]]
+    elems: t.Optional[t.FrozenSet[T]]
 
     def __init__(
         self,
         name: str,
         color: str,
         set: t.Optional[UpSetSetLike[T]] = None,
-        elems: t.Optional[t.Sequence[T]] = None,
+        elems: t.Optional[t.FrozenSet[T]] = None,
     ):
         super().__init__()
         self.type = type
