@@ -17,7 +17,7 @@ pytest-runner = ">=5.1"
 black = "*"
 autopep8 = "*"
 pytest-cov = "*"
-nbval = "*"
+# nbval = "*"
 jupyterlab = "*"
 
 [packages]
