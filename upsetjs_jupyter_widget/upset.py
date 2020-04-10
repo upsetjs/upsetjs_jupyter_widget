@@ -143,7 +143,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
             typee = value.get("type", "set")
             name = value["name"]
             elems = frozenset(self.elems[i] for i in value.get("elems", []))
-            sets = frozenset(self.sets[i] for i in value.get("sets", []))
+            setByName = {s.name: s for s in self.sets}
+            sets = frozenset(setByName[n] for n in value.get("set_names", []))
             # look by name
             if typee == "set":
                 return UpSetSet[T](name, elems)
