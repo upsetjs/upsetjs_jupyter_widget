@@ -1,10 +1,17 @@
+"""
+model definitions for UpSet
+"""
 import typing as t
 from enum import Enum
 
-T = t.TypeVar("T")
+T = t.TypeVar("T")  # pylint: disable=invalid-name
 
 
 class UpSetSetType(Enum):
+    """
+    enum of which type the set is
+    """
+
     SET = ("set",)
     INTERSECTION = "intersection"
     UNION = "union"
@@ -13,37 +20,54 @@ class UpSetSetType(Enum):
     def __str__(self):
         if self == UpSetSetType.SET:
             return "set"
-        elif self == UpSetSetType.INTERSECTION:
+        if self == UpSetSetType.INTERSECTION:
             return "intersection"
-        elif self == UpSetSetType.UNION:
+        if self == UpSetSetType.UNION:
             return "union"
         return "composite"
 
 
 class UpSetBaseSet(t.Generic[T]):
-    type: UpSetSetType
+    """
+    a set base class
+    """
+
+    set_type: UpSetSetType
     name: str
     elems: t.FrozenSet[T]
 
     def __init__(
-        self, type: UpSetSetType, name: str, elems: t.Optional[t.FrozenSet[T]] = None
+        self,
+        set_type: UpSetSetType,
+        name: str,
+        elems: t.Optional[t.FrozenSet[T]] = None,
     ):
         super().__init__()
-        self.type = type
+        self.set_type = set_type
         self.name = name
         self.elems = elems or frozenset()
 
     @property
     def cardinality(self):
+        """
+        the cardinality of this set
+        """
         return len(self.elems)
 
 
 class UpSetSet(UpSetBaseSet[T]):
+    """
+    a set representation within UpSet
+    """
+
     def __init__(self, name: str = "", elems: t.Optional[t.FrozenSet[T]] = None):
         super().__init__(UpSetSetType.SET, name, elems)
 
     @property
     def degree(self):
+        """
+        the degree of this set, i.e., the number of contained sets
+        """
         return 1
 
     def __repr__(self):
@@ -51,20 +75,27 @@ class UpSetSet(UpSetBaseSet[T]):
 
 
 class UpSetSetCombination(UpSetBaseSet[T]):
+    """
+    a set cobmination within UpSet like an intersection
+    """
+
     sets: t.FrozenSet[UpSetSet[T]]
 
     def __init__(
         self,
-        type: UpSetSetType,
+        set_type: UpSetSetType,
         name: str = "",
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
     ):
-        super().__init__(type, name, elems)
+        super().__init__(set_type, name, elems)
         self.sets = sets or frozenset()
 
     @property
     def degree(self):
+        """
+        the degree of this set, i.e., the number of contained sets
+        """
         return len(self.sets)
 
     def __repr__(self):
@@ -73,6 +104,10 @@ class UpSetSetCombination(UpSetBaseSet[T]):
 
 
 class UpSetSetIntersection(UpSetSetCombination[T]):
+    """
+    a set intersection representation in UpSet
+    """
+
     def __init__(
         self,
         name: str = "",
@@ -83,6 +118,10 @@ class UpSetSetIntersection(UpSetSetCombination[T]):
 
 
 class UpSetSetUnion(UpSetSetCombination[T]):
+    """
+    a set union representation in UpSet
+    """
+
     def __init__(
         self,
         name: str = "",
@@ -93,6 +132,10 @@ class UpSetSetUnion(UpSetSetCombination[T]):
 
 
 class UpSetSetComposite(UpSetSetCombination[T]):
+    """
+    a set composite representation in UpSet
+    """
+
     def __init__(
         self,
         name: str = "",
@@ -108,6 +151,10 @@ UpSetSetLike = t.Union[
 
 
 class UpSetQuery(t.Generic[T]):
+    """
+    a query representation in UpSet
+    """
+
     name: str
     color: str
     set: t.Optional[UpSetSetLike[T]]
@@ -117,14 +164,14 @@ class UpSetQuery(t.Generic[T]):
         self,
         name: str,
         color: str,
-        set: t.Optional[UpSetSetLike[T]] = None,
+        upset: t.Optional[UpSetSetLike[T]] = None,
         elems: t.Optional[t.FrozenSet[T]] = None,
     ):
         super().__init__()
         self.type = type
         self.name = name
         self.color = color
-        self.set = set
+        self.set = upset
         self.elems = elems
 
     def __repr__(self):

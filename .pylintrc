@@ -1,0 +1,9 @@
+[MESSAGES CONTROL]
+disable=bad-continuation,
+        too-many-return-statements,
+        too-many-instance-attributes,
+        too-few-public-methods,
+        line-too-long,
+        duplicate-code,
+        too-many-arguments,
+        too-many-ancestors
