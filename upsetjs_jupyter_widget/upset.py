@@ -140,7 +140,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
                     (
                         s
                         for s in self.combinations
-                        if s.name == name and str(s.type) == typee
+                        if s.name == name and str(s.set_type) == typee
                     ),
                     None,
                 )
