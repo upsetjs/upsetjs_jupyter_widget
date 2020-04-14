@@ -1210,6 +1210,47 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@upsetjs/jupyter_widget@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@upsetjs/jupyter_widget@workspace:."
+  dependencies:
+    "@jupyter-widgets/base": ^2 || ^3 || ^4.0.0-alpha.0
+    "@jupyterlab/services": ^5.1.0
+    "@phosphor/application": ^1.7.3
+    "@phosphor/widgets": ^1.9.3
+    "@types/backbone": ^1.4.1
+    "@types/jest": ^25.2.1
+    "@typescript-eslint/eslint-plugin": ^2.27.0
+    "@typescript-eslint/parser": ^2.27.0
+    "@upsetjs/bundle": ^0.4.1
+    "@yarnpkg/pnpify": ^2.0.0-rc.20
+    babel-eslint: ^10.1.0
+    backbone: ^1.4.0
+    eslint: ^6.8.0
+    eslint-config-prettier: ^6.10.1
+    eslint-config-react-app: ^5.2.1
+    eslint-plugin-flowtype: ^4.7.0
+    eslint-plugin-import: ^2.20.2
+    eslint-plugin-jsx-a11y: ^6.2.3
+    eslint-plugin-prettier: ^3.1.2
+    eslint-plugin-react: ^7.19.0
+    eslint-plugin-react-hooks: ^3.0.0
+    jest: ^25.3.0
+    jest-config: ^25.3.0
+    mkdirp: ^1.0.4
+    npm-run-all: ^4.1.5
+    pnp-webpack-plugin: ^1.6.4
+    prettier: ^2.0.4
+    rimraf: ^3.0.2
+    ts-jest: 25.3.1
+    ts-loader: ^6.2.2
+    tslib: ^1.11.1
+    typescript: ^3.8.3
+    webpack: ^4.42.1
+    webpack-cli: ^3.3.11
+  languageName: unknown
+  linkType: soft
+
 "@upsetjs/model@npm:^0.4.1":
   version: 0.4.1
   resolution: "@upsetjs/model@npm:0.4.1"
@@ -8480,47 +8521,6 @@ typescript@^3.8.3:
   checksum: 2/ecb08ff3e7e3b152e03bceb7089e6f0077bf3494764397a301eb99a7a5cd4c593ea4d0b13a7714195ad8a3ddca9d7a5964037a1c0bc712e1ba7b67a79165a0be
   languageName: node
   linkType: hard
-
-"upsetjs_jupyter_widget@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "upsetjs_jupyter_widget@workspace:."
-  dependencies:
-    "@jupyter-widgets/base": ^2 || ^3 || ^4.0.0-alpha.0
-    "@jupyterlab/services": ^5.1.0
-    "@phosphor/application": ^1.7.3
-    "@phosphor/widgets": ^1.9.3
-    "@types/backbone": ^1.4.1
-    "@types/jest": ^25.2.1
-    "@typescript-eslint/eslint-plugin": ^2.27.0
-    "@typescript-eslint/parser": ^2.27.0
-    "@upsetjs/bundle": ^0.4.1
-    "@yarnpkg/pnpify": ^2.0.0-rc.20
-    babel-eslint: ^10.1.0
-    backbone: ^1.4.0
-    eslint: ^6.8.0
-    eslint-config-prettier: ^6.10.1
-    eslint-config-react-app: ^5.2.1
-    eslint-plugin-flowtype: ^4.7.0
-    eslint-plugin-import: ^2.20.2
-    eslint-plugin-jsx-a11y: ^6.2.3
-    eslint-plugin-prettier: ^3.1.2
-    eslint-plugin-react: ^7.19.0
-    eslint-plugin-react-hooks: ^3.0.0
-    jest: ^25.3.0
-    jest-config: ^25.3.0
-    mkdirp: ^1.0.4
-    npm-run-all: ^4.1.5
-    pnp-webpack-plugin: ^1.6.4
-    prettier: ^2.0.4
-    rimraf: ^3.0.2
-    ts-jest: 25.3.1
-    ts-loader: ^6.2.2
-    tslib: ^1.11.1
-    typescript: ^3.8.3
-    webpack: ^4.42.1
-    webpack-cli: ^3.3.11
-  languageName: unknown
-  linkType: soft
 
 "uri-js@npm:^4.2.2":
   version: 4.2.2

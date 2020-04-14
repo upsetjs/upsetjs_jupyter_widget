@@ -2,7 +2,7 @@
 
 import { DOMWidgetModel, DOMWidgetView, ISerializers } from '@jupyter-widgets/base';
 
-import { MODULE_NAME, MODULE_VERSION } from './version';
+import { MODULE_VERSION, MODULE_NAME } from './version';
 import {
   isElemQuery,
   ISetCombinations,

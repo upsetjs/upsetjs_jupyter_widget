@@ -1,5 +1,5 @@
 {
-  "name": "upsetjs_jupyter_widget",
+  "name": "@upsetjs/jupyter_widget",
   "version": "0.1.0",
   "description": "A Jupyter Widget Library around UpSet.js",
   "license": "AGPL-3.0",

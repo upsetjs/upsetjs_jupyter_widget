@@ -10,7 +10,7 @@ def _jupyter_nbextension_paths():
         {
             "section": "notebook",
             "src": "nbextension/static",
-            "dest": "upsetjs_jupyter_widget",
-            "require": "upsetjs_jupyter_widget/extension",
+            "dest": "@upsetjs/jupyter_widget",
+            "require": "@upsetjs/jupyter_widget/extension",
         }
     ]

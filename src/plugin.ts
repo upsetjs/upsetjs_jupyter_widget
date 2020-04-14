@@ -6,7 +6,7 @@ import { IJupyterWidgetRegistry } from '@jupyter-widgets/base';
 import * as widgetExports from './widget';
 import { MODULE_NAME, MODULE_VERSION } from './version';
 
-const EXTENSION_ID = 'upsetjs_jupyter_widget:plugin';
+const EXTENSION_ID = '@upsetjs/jupyter_widget:plugin';
 
 /**
  * The example plugin.
