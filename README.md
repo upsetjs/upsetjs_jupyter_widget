@@ -101,13 +101,12 @@ yarn build
 
 ### Release
 
-1. update version in `package.json`, `upsetjs_jupyter_widget/_frontend.py`, `upsetjs_jupyter_widget/_version.py`, `src/version.ts`
-
 1. `rm dist/*`
 1. `yarn build:lib`
 1. `yarn npm publish --access public`
 1. `python setup.py clean sdist bdist_wheel`
 1. `twine upload dist/*`
+1. update version in `package.json`, `upsetjs_jupyter_widget/_frontend.py`, `upsetjs_jupyter_widget/_version.py`, `src/version.ts`
 
 ## License
 

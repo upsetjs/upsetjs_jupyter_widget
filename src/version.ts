@@ -6,7 +6,7 @@
  * The html widget manager assumes that this is the same as the npm package
  * version number.
  */
-export const MODULE_VERSION = '0.4.1';
+export const MODULE_VERSION = '0.4.2';
 
 /*
  * The current package name.
