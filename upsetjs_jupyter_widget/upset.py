@@ -260,6 +260,38 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         return self
 
     @property
+    def width(self) -> t.Union[str, int]:
+        """
+        get the widget width
+        """
+        if self.layout.width.endswidth("px"):
+            return int(self.layout.width[:-2])
+        return self.layout.width
+
+    @width.setter
+    def width(self, value: t.Union[str, int]):
+        if isinstance(value, int):
+            self.layout.width = f"{value}px"
+        else:
+            self.layout.width = value
+
+    @property
+    def height(self) -> t.Union[str, int]:
+        """
+        get the widget height
+        """
+        if self.layout.height.endswidth("px"):
+            return int(self.layout.height[:-2])
+        return self.layout.height
+
+    @height.setter
+    def height(self, value: t.Union[str, int]):
+        if isinstance(value, int):
+            self.layout.height = f"{value}px"
+        else:
+            self.layout.height = value
+
+    @property
     def queries(self):
         """
         current list of UpSet queries
