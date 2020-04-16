@@ -67,3 +67,22 @@ jobs:
       - name: py.lint
         shell: pipenv run bash {0}
         run: pylint upsetjs_jupyter_widget
+
+      - name: Build Notebooks
+        shell: pipenv run bash {0}
+        run: jupyter nbconvert examples/*.ipynb --to html
+      - run: |
+          mkdir -p public/jupyter
+          mv examples/introduction.html public/jupyter/index.html
+          mv examples/*.html public/jupyter/
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          external_repository: upsetjs/upsetjs.github.io
+          publish_branch: master
+          publish_dir: ./public
+          enable_jekyll: true
+          keep_files: true

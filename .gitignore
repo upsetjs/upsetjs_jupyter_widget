@@ -165,3 +165,4 @@ src/**/*.d.ts
 /.mypy_cache
 /junit
 /MANIFEST
+/examples/*.html
