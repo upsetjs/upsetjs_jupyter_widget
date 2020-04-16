@@ -56,7 +56,7 @@ module.exports = [
       filename: 'index.js',
       path: path.resolve(__dirname, 'dist'),
       libraryTarget: 'amd',
-      library: 'upsetjs_jupyter_widget',
+      library: '@upsetjs/jupyter_widget',
       publicPath: 'https://unpkg.com/@upsetjs/jupyter_widget@' + version + '/dist/',
     },
     devtool: 'source-map',
@@ -78,7 +78,7 @@ module.exports = [
     output: {
       filename: 'embed-bundle.js',
       path: path.resolve(__dirname, 'docs', 'source', '_static'),
-      library: 'upsetjs_jupyter_widget',
+      library: '@upsetjs/jupyter_widget',
       libraryTarget: 'amd',
     },
     module: {
