@@ -80,24 +80,28 @@ pipenv run jupyter labextension install .
 
 ## Commands
 
-## Testing
+### Testing
 
 ```sh
 yarn test
 ```
 
-## Linting
+### Linting
 
 ```sh
 yarn lint
 ```
 
-## Building
+### Building
 
 ```sh
 yarn install
 yarn build
 ```
+
+### Release
+
+1. update version in `package.json`, `upsetjs_jupyter_widget/_frontend.py`, `upsetjs_jupyter_widget/_version.py`, `src/version.ts`
 
 ## License
 
