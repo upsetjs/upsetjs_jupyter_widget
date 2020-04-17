@@ -50,7 +50,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     _view_module = Unicode(MODULE_NAME).tag(sync=True)
     _view_module_version = Unicode(MODULE_VERSION).tag(sync=True)
 
-    mode: str = Enum(("hover", "click"), default_value="hover").tag(sync=True)
+    mode: str = Enum(("hover", "click", "static"), default_value="hover").tag(sync=True)
     padding: float = Float(None, allow_none=True).tag(sync=True)
     bar_padding: float = Float(None, allow_none=True).tag(sync=True)
     dot_padding: float = Float(None, allow_none=True).tag(sync=True)
@@ -111,6 +111,56 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.observe(self._sync_value, "value")
+
+    def copy(self):
+        """
+        returns a copy of itself
+        """
+        clone = UpSetWidget[T]()
+        clone.mode = self.mode
+        clone.padding = self.padding
+        clone.bar_padding = self.bar_padding
+        clone.dot_padding = self.dot_padding
+        clone.width_ratios = self.width_ratios
+        clone.height_ratios = self.height_ratios
+        clone.elems = list(self.elems)
+        clone._elem_to_index = self._elem_to_index.copy()
+
+        clone._sets_obj = list(self._sets_obj)
+        clone._sets = list(self._sets)
+
+        clone._combinations_obj = list(self._combinations_obj)
+        clone._combinations = list(self._combinations)
+
+        clone.value = self.value
+        clone._selection = self._selection
+
+        clone._queries_obj = list(self._queries_obj)
+        clone._queries = list(self._queries)
+
+        clone.theme = self.theme
+        clone.selection_color = self.selection_color
+        clone.alternating_background_color = self.alternating_background_color
+        clone.color = self.color
+        clone.text_color = self.text_color
+        clone.hover_hint_color = self.hover_hint_color
+        clone.not_member_color = self.not_member_color
+
+        clone.bar_label_offset = self.bar_label_offset
+        clone.set_name_axis_offset = self.set_name_axis_offset
+        clone.combination_name_axis_offset = self.combination_name_axis_offset
+
+        clone.query_legend = self.query_legend
+        clone.export_buttons = self.export_buttons
+        clone.font_family = self.font_family
+        clone.font_sizes = self.font_sizes.copy()
+        clone.numeric_scale = self.numeric_scale
+        clone.band_scale = self.band_scale
+
+        clone.set_name = self.set_name
+        clone.combination_name = self.combination_name
+
+        return clone
 
     def _sync_value(self, evt: t.Any):
         self._selection = self._value_to_selection(evt["new"])
@@ -233,7 +283,26 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         """
         add callback listener to listen for selection changes
         """
-        self.observe(lambda: callback(self.selection), "value")
+        self.observe(lambda _: callback(self.selection), "value")
+
+    @property
+    def queries(self):
+        """
+        current list of UpSet queries
+        """
+        return self._queries_obj
+
+    @queries.setter
+    def queries(self, value: t.List[UpSetQuery[T]]):
+        self._queries_obj = value
+        self._queries = [self._to_query(v) for v in value]
+
+    def clear_queries(self):
+        """
+        deletes the list of queries
+        """
+        self._queries = []
+        self._queries_obj = []
 
     def append_query(
         self,
@@ -251,13 +320,16 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         else:
             query = UpSetQuery[T](name, color, elems=elems or frozenset())
         self._queries_obj.append(query)
+        self._queries = self._queries + [self._to_query(query)]
+        return self
+
+    def _to_query(self, query: UpSetQuery[T]):
         query_dict: t.Dict = dict(name=query.name, color=query.color)
         if query.set:
             query_dict["set"] = dict(name=query.set.name, type=str(query.set.set_type))
         else:
             query_dict["elems"] = [self._elem_to_index[e] for e in query.elems or []]
-        self._queries.append(query_dict)
-        return self
+        return query_dict
 
     @property
     def width(self) -> t.Union[str, int]:
@@ -291,20 +363,6 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         else:
             self.layout.height = value
 
-    @property
-    def queries(self):
-        """
-        current list of UpSet queries
-        """
-        return self._queries_obj
-
-    def clear_queries(self):
-        """
-        deletes the list of queries
-        """
-        self._queries = []
-        self._queries_obj = []
-
     @default("layout")
     def _default_layout(self):  # pylint: disable=no-self-use
         return Layout(height="400px", align_self="stretch")
@@ -327,6 +385,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         base_sets: t.List[UpSetSet[T]] = [
             UpSetSet[T](name=k, elems=frozenset(v)) for k, v in sets.items()
         ]
+        self.clear_queries()
+        self.selection = None
         self.sets = t.cast(t.Any, _sort_sets(base_sets, order_by, limit))
         return self.generate_intersections(order_by=order_by)
 
@@ -347,6 +407,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
             return UpSetSet[T](name=name, elems=frozenset(elems))
 
         base_sets = [to_set(name, series) for name, series in data_frame.items()]
+        self.clear_queries()
+        self.selection = None
         self.sets = t.cast(t.Any, _sort_sets(base_sets, order_by, limit))
         return self.generate_intersections(order_by=order_by)
 

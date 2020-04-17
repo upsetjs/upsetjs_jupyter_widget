@@ -99,13 +99,13 @@ export class UpSetView extends DOMWidgetView {
       if (
         v == null ||
         (Array.isArray(v) && v.length === 0) ||
-        (key.startsWith('_') && key !== '_queries' && key !== '_sets') ||
+        (key.startsWith('_') && key !== '_queries' && key !== '_sets' && key !== '_combinations') ||
         key === 'layout'
       ) {
         return;
       }
       const propName = toPropName(key);
-      if (propName === 'fontSizes' || propName === 'combinations') {
+      if (propName === 'fontSizes') {
         const converted: any = {};
         Object.keys(v).forEach((key: string) => {
           converted[toCamelCase(key)] = (v as any)![key];
@@ -168,17 +168,17 @@ export class UpSetView extends DOMWidgetView {
       });
     }
 
+    delete props.onHover;
+    delete props.onClick;
     if (this.model.get('mode') === 'click') {
       props.onClick = this.changeSelection;
-      delete props.onHover;
-    } else {
+    } else if (this.model.get('mode') === 'hover') {
       props.onHover = this.changeSelection;
-      delete props.onClick;
     }
   }
 
-  private changed_prop(model: any, options: any) {
-    console.log(model, options);
+  private changed_prop(model: any) {
+    this.updateProps(model.changed);
   }
 
   private renderImpl() {
