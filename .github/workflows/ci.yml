@@ -72,8 +72,8 @@ jobs:
         shell: pipenv run bash {0}
         run: jupyter nbconvert examples/*.ipynb --to html
       - run: |
-          mkdir -p public/jupyter
-          mv examples/introduction.html public/jupyter/index.html
+          mkdir -p public/integrations/jupyter
+          mv examples/introduction.html public/integrations/jupyter/index.html
 
         # mv examples/*.html public/jupyter/
       - name: Deploy
