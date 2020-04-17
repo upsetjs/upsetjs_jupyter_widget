@@ -108,15 +108,40 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     set_name: str = Unicode(None, allow_none=True).tag(sync=True)
     combination_name: str = Unicode(None, allow_none=True).tag(sync=True)
 
-    def __init__(self, **kwargs):
+    def __init__(self, clonee=None, **kwargs):
         super().__init__(**kwargs)
+
+        if clonee:
+            self._elem_to_index = clonee["_elem_to_index"]
+            self._sets_obj = clonee["_sets_obj"]
+            self._sets = clonee["_sets"]
+
+            self._combinations_obj = clonee["_combinations_obj"]
+            self._combinations = clonee["_combinations"]
+
+            self._selection = clonee["_selection"]
+
+            self._queries_obj = clonee["_queries_obj"]
+            self._queries = clonee["_queries"]
+
         self.observe(self._sync_value, "value")
 
-    def copy(self):
+    def copy(self) -> "UpSetWidget":
         """
         returns a copy of itself
         """
-        clone = UpSetWidget[T]()
+        clone = UpSetWidget[T](  # pylint: disable=unsubscriptable-object
+            clonee=dict(
+                _elem_to_index=self._elem_to_index.copy(),
+                _sets_obj=list(self._sets_obj),
+                _sets=list(self._sets),
+                _combinations_obj=list(self._combinations_obj),
+                _combinations=list(self._combinations),
+                _selection=self._selection,
+                _queries_obj=list(self._queries_obj),
+                _queries=list(self._queries),
+            )
+        )
         clone.mode = self.mode
         clone.padding = self.padding
         clone.bar_padding = self.bar_padding
@@ -124,19 +149,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         clone.width_ratios = self.width_ratios
         clone.height_ratios = self.height_ratios
         clone.elems = list(self.elems)
-        clone._elem_to_index = self._elem_to_index.copy()
-
-        clone._sets_obj = list(self._sets_obj)
-        clone._sets = list(self._sets)
-
-        clone._combinations_obj = list(self._combinations_obj)
-        clone._combinations = list(self._combinations)
 
         clone.value = self.value
-        clone._selection = self._selection
-
-        clone._queries_obj = list(self._queries_obj)
-        clone._queries = list(self._queries)
 
         clone.theme = self.theme
         clone.selection_color = self.selection_color
