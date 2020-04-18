@@ -166,3 +166,4 @@ src/**/*.d.ts
 /junit
 /MANIFEST
 /examples/*.html
+/.pypirc

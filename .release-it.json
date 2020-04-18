@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "before:init": "yarn lint && yarn lint:p",
+    "before:release": "yarn build:p",
+    "after:npm:release": "twine upload dist/upsetjs_*",
+    "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+  },
+  "git": {
+    "tagName": "v${version}"
+  },
+  "npm": {
+    "publish": true
+  },
+  "github": {
+    "release": true,
+    "assets": ["dist/*.tar.gz", "dist/*.whl", "upsetjs_jupyter_widget/labextension/*.tgz"]
+  },
+  "plugins": {
+    "./scripts/bump.js": {}
+  }
+}

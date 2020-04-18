@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - run: npm i -g yarn
       - run: yarn set version berry
       - run: yarn config set checksumBehavior ignore
@@ -38,10 +38,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
         with:
-          python-version: "3.7"
+          python-version: '3.7'
       - uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: '12.x'
       - name: Cache pip
         uses: actions/cache@v1
         with:
@@ -58,15 +58,9 @@ jobs:
       - name: pytest
         shell: pipenv run bash {0}
         run: pytest --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-      - name: MyPy
+      - name: Lint
         shell: pipenv run bash {0}
-        run: mypy -p upsetjs_jupyter_widget
-      - name: Black
-        shell: pipenv run bash {0}
-        run: black --target-version=py37 --check upsetjs_jupyter_widget
-      - name: py.lint
-        shell: pipenv run bash {0}
-        run: pylint upsetjs_jupyter_widget
+        run: npm run lint:p
 
       - name: Build Notebooks
         shell: pipenv run bash {0}
@@ -74,7 +68,6 @@ jobs:
       - run: |
           mkdir -p public/integrations/jupyter
           mv examples/introduction.html public/integrations/jupyter/index.html
-
         # mv examples/*.html public/jupyter/
       - name: Deploy
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
