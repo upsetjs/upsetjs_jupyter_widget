@@ -111,8 +111,6 @@ yarn release-minor
 yarn release-patch
 ```
 
-1. update version in `package.json`, `upsetjs_jupyter_widget/_frontend.py`, `upsetjs_jupyter_widget/_version.py`, `src/version.ts`
-
 ## License
 
 ### Commercial license

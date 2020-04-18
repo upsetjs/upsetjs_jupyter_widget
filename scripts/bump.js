@@ -16,7 +16,7 @@ function bumpImpl(version) {
     /^version_info =.*$/gm,
     `version_info = (${version.split('.').join(', ')})  # pylint: disable=C0103`
   );
-  bumpFile('./src/version.ts', /^export const MODULE_VERSION = .*$/gm, `export const MODULE_VERSION = '${version}'`);
+  bumpFile('./src/version.ts', /^export const MODULE_VERSION = .*$/gm, `export const MODULE_VERSION = '${version}';`);
 }
 
 class MyVersionPlugin extends Plugin {
