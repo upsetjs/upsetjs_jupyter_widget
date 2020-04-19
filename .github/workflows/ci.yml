@@ -79,3 +79,16 @@ jobs:
           publish_dir: ./public
           enable_jekyll: true
           keep_files: true
+      - run: |
+          mkdir -p demos/jupyter
+          cp examples/*.ipynb demos/jupyter/
+      - name: Deploy
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEMO_DEPLOY_KEY }}
+          external_repository: upsetjs/upsetjs_demos
+          publish_branch: master
+          publish_dir: ./demos
+          enable_jekyll: true
+          keep_files: true

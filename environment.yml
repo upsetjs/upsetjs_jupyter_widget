@@ -1,4 +1,0 @@
-# Conda environment for mybinder
-name: upsetjs_jupyter_widget
-dependencies:
-  - upsetjs_jupyter_widget
