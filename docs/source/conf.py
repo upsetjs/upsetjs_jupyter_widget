@@ -29,8 +29,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "sphinx.ext.todo",
-    "nbsphinx",
-    "nbsphinx_link",
+    # "nbsphinx",
+    # "nbsphinx_link",
 ]
 
 # Ensure our extension is available:

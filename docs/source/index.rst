@@ -32,11 +32,6 @@ Contents
 .. toctree::
    :maxdepth: 1
 
-   examples/index
-
-.. toctree::
-   :maxdepth: 1
-
    api/index
 
 .. toctree::
