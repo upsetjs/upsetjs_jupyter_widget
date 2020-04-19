@@ -25,7 +25,7 @@ notebook (as opposed to Jupyterlab), run::
 with the `appropriate flag`_. If you are using Jupyterlab, install the extension
 with::
 
-    jupyter labextension install upsetjs_jupyter_widget
+    jupyter labextension install @upsetjs/jupyter_widget
 
 If you are installing using conda, these commands should be unnecessary, but If
 you need to run them the commands should be the same (just make sure you choose the

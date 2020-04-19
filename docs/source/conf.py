@@ -27,9 +27,9 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
+    "sphinx_autodoc_typehints",
     "sphinx.ext.todo",
     "nbsphinx",
-    "jupyter_sphinx.execute",
     "nbsphinx_link",
 ]
 
@@ -37,10 +37,12 @@ extensions = [
 import sys
 from os.path import dirname, join as pjoin
 
-docs = dirname(dirname(__file__))
+source = dirname(__file__)
+docs = dirname(source)
 root = dirname(docs)
 sys.path.insert(0, root)
 sys.path.insert(0, pjoin(docs, "sphinxext"))
+sys.path.insert(0, pjoin(docs, "upsetjs_jupyter_widget"))
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -69,9 +71,7 @@ author = "Samuel Gratzl"
 # get version from python package:
 import os
 
-here = os.path.dirname(__file__)
-repo = os.path.join(here, "..", "..")
-_version_py = os.path.join(repo, "upsetjs_jupyter_widget", "_version.py")
+_version_py = os.path.join(root, "upsetjs_jupyter_widget", "_version.py")
 version_ns = {}
 with open(_version_py) as f:
     exec(f.read(), version_ns)
@@ -123,20 +123,20 @@ htmlhelp_basename = "upsetjs_jupyter_widgetdoc"
 
 # -- Options for LaTeX output ---------------------------------------------
 
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
+# latex_elements = {
+# The paper size ('letterpaper' or 'a4paper').
+#
+# 'papersize': 'letterpaper',
+# The font size ('10pt', '11pt' or '12pt').
+#
+# 'pointsize': '10pt',
+# Additional stuff for the LaTeX preamble.
+#
+# 'preamble': '',
+# Latex figure (float) alignment
+#
+# 'figure_align': 'htbp',
+# }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
@@ -208,10 +208,14 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 nbsphinx_allow_errors = True  # exception ipstruct.py ipython_genutils
 
 
+# https://pypi.org/project/sphinx-autodoc-typehints/
+always_document_param_types = True
+
+
 def setup(app):
     def add_scripts(app):
         for fname in ["helper.js", "embed-bundle.js"]:
-            if not os.path.exists(os.path.join(here, "_static", fname)):
+            if not os.path.exists(os.path.join(source, "_static", fname)):
                 app.warn("missing javascript file: %s" % fname)
             app.add_javascript(fname)
 

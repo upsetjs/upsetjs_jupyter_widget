@@ -49,6 +49,7 @@
     "watch": "npm-run-all -p watch:*",
     "watch:lib": "tsc -w -p tsconfig.build.json",
     "watch:nbextension": "webpack -w",
+    "docs:p": "cd docs && sphinx-build -b html \"source\" \"build\"",
     "release:major": "release-it --disable-metrics major",
     "release:minor": "release-it --disable-metrics minor",
     "release:patch": "release-it --disable-metrics patch"

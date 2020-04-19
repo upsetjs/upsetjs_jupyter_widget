@@ -129,4 +129,4 @@ This library is released under the `GNU AGPLv3` version to be used for private a
 [nbviewer]: https://img.shields.io/badge/NBViewer-open-blue?logo=jupyter
 [nbviewer-url]: https://nbviewer.jupyter.org/github/upsetjs/upsetjs_jupyter_widget/blob/master/examples/introduction.ipynb
 [binder]: http://mybinder.org/badge_logo.svg
-[binder-url]: https://mybinder.org/v2/gh/upsetjs/upsetjs_jupyter_widget/master?urlpath=lab/examples/introduction.ipynb
+[binder-url]: https://mybinder.org/v2/gh/upsetjs/upsetjs_jupyter_widget/master?urlpath=lab/tree/examples/introduction.ipynb

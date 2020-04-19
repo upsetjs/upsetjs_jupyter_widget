@@ -23,6 +23,9 @@ from ._model import (
 from ._generate import generate_unions, generate_intersections
 
 
+__all__ = ["UpSetWidget"]
+
+
 def _sort_sets(
     sets: t.Sequence[UpSetSetLike[T]], order_by: str, limit: t.Optional[int] = None,
 ) -> t.List[UpSetSetLike[T]]:
