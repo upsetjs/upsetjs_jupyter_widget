@@ -3,8 +3,10 @@ channels:
   - conda-forge
 dependencies:
   - python
+  - jupyterlab==2.1.0
   - numpy
   - pandas
   - pip
   - pip:
+      - ipywidgets==8.0.0a0
       - upsetjs_jupyter_widget
