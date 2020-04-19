@@ -1,6 +1,6 @@
 # UpSet.js Jupyter Widget
 
-[![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url] [![Open in NBViewer][nbviewer]][nbviewer-url] [![Open in Binder][binder]][binder-url]
+[![NPM Package][npm-image]][npm-url] [![Github Actions][github-actions-image]][github-actions-url] [![Open in NBViewer][nbviewer]][nbviewer-url] [![Open in Binder][binder]][binder-url] [![Open API Docs][docs]][docs-url]
 
 A Jupyter Widget Library around [UpSet.js](https://github.com/upsetjs/upsetjs).
 
@@ -128,5 +128,7 @@ This library is released under the `GNU AGPLv3` version to be used for private a
 [codepen]: https://img.shields.io/badge/CodePen-open-blue?logo=codepen
 [nbviewer]: https://img.shields.io/badge/NBViewer-open-blue?logo=jupyter
 [nbviewer-url]: https://nbviewer.jupyter.org/github/upsetjs/upsetjs_jupyter_widget/blob/master/examples/introduction.ipynb
-[binder]: http://mybinder.org/badge_logo.svg
+[binder]: https://mybinder.org/badge_logo.svg
 [binder-url]: https://mybinder.org/v2/gh/upsetjs/upsetjs_jupyter_widget/master?urlpath=lab/tree/examples/introduction.ipynb
+[docs]: https://img.shields.io/badge/API-open-blue
+[docs-url]: https://upset.js.org/api/jupyter
