@@ -18,7 +18,7 @@ Or if you use jupyterlab:
 
 ```bash
 pip install upsetjs_jupyter_widget
-jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0.alpha-0
+jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0
 ```
 
 ## Usage
