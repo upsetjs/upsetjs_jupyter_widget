@@ -1,0 +1,10 @@
+name: upsetjs-jupyter-widget
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - numbpy
+  - pandas
+  - pip
+  - pip:
+      - upsetjs_jupyter_widget
