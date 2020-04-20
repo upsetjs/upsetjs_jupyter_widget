@@ -11,9 +11,9 @@ import {
   renderUpSet,
   UpSetProps,
   UpSetQuery,
-  //boxplotAddon
+  boxplotAddon,
 } from '@upsetjs/bundle';
-import { fixCombinations, fixSets, resolveSet, fromIndicesArray } from './utils';
+import { fixCombinations, fixSets, resolveSet, fromIndicesArray, IElem } from './utils';
 
 export class UpSetModel extends DOMWidgetModel {
   defaults() {
@@ -42,13 +42,14 @@ export class UpSetModel extends DOMWidgetModel {
 }
 
 export class UpSetView extends DOMWidgetView {
-  private props: UpSetProps<any> = {
+  private props: UpSetProps<IElem> = {
     sets: [],
     width: 300,
     height: 300,
   };
-  private elems: any[] = [];
-  private readonly elemToIndex = new Map<any, number>();
+  private elems: IElem[] = [];
+  private readonly elemToIndex = new Map<IElem, number>();
+  private attrs: { [key: string]: number[] } = {};
 
   render() {
     this.model.on('change', this.changed_prop, this);
@@ -56,7 +57,7 @@ export class UpSetView extends DOMWidgetView {
     this.updateProps(this.stateToProps());
   }
 
-  private changeSelection = (s: ISetLike<any> | null) => {
+  private changeSelection = (s: ISetLike<IElem> | null) => {
     this.model.off('change', this.changed_prop, null);
     if (!s) {
       this.model.set('value', null);
@@ -126,14 +127,51 @@ export class UpSetView extends DOMWidgetView {
     this.renderImpl();
   }
 
+  private syncAddons(keys: string[]) {
+    if (keys.length === 0) {
+      delete this.props.setAddons;
+      delete this.props.combinationAddons;
+      return;
+    }
+    this.props.setAddons = keys.map((key) =>
+      boxplotAddon((v) => v.attrs[key], this.elems, {
+        name: key,
+      })
+    );
+    this.props.combinationAddons = keys.map((key) =>
+      boxplotAddon((v) => v.attrs[key], this.elems, {
+        name: key,
+        orient: 'vertical',
+      })
+    );
+  }
+
   private fixProps(delta: any) {
     const props = this.props;
-
     if (delta.elems != null) {
-      this.elems = delta.elems;
+      this.attrs = delta.attrs ?? this.attrs;
+      const keys = Object.keys(this.attrs);
+      this.elems = (delta.elems as any[]).map((name, i) => {
+        const attrs: any = {};
+        keys.forEach((key) => (attrs[key] = this.attrs[key][i]));
+        return { name, attrs };
+      });
       this.elemToIndex.clear();
       this.elems.forEach((e, i) => this.elemToIndex.set(e, i));
+      this.syncAddons(keys);
+    } else if (delta.attrs != null) {
+      // only attrs same elems
+      this.attrs = delta.attrs;
+      const keys = Object.keys(this.attrs);
+      this.elems.forEach((elem, i) => {
+        const attrs: any = {};
+        keys.forEach((key) => (attrs[key] = this.attrs[key][i]));
+        elem.attrs = attrs;
+      });
+      this.syncAddons(keys);
     }
+    delete (this.props as any).elems;
+    delete (this.props as any).attrs;
 
     if (delta.sets != null) {
       props.sets = fixSets(delta.sets, this.elems);
@@ -150,7 +188,7 @@ export class UpSetView extends DOMWidgetView {
       props.selection = resolveSet(
         delta.selection,
         props.sets ?? [],
-        (props.combinations ?? []) as ISetCombinations<any>,
+        (props.combinations ?? []) as ISetCombinations<IElem>,
         this.elems
       );
     }
@@ -161,7 +199,7 @@ export class UpSetView extends DOMWidgetView {
             set: resolveSet(
               query.set,
               props.sets ?? [],
-              (props.combinations ?? []) as ISetCombinations<any>,
+              (props.combinations ?? []) as ISetCombinations<IElem>,
               this.elems
             )!,
           });

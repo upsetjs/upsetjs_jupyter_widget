@@ -7,6 +7,11 @@ import {
   ISets,
 } from '@upsetjs/bundle';
 
+export interface IElem {
+  name: string;
+  attrs: { [key: string]: number };
+}
+
 export function fromIndicesArray<T>(arr: ReadonlyArray<number> | string, elems: ReadonlyArray<T>): ReadonlyArray<T> {
   if (typeof arr === 'string') {
     return []; // TODO use library version
@@ -14,7 +19,7 @@ export function fromIndicesArray<T>(arr: ReadonlyArray<number> | string, elems: 
   return arr.map((i) => elems[i]);
 }
 
-export function fixSets(sets: ISets<any>, elems: any[]) {
+export function fixSets(sets: ISets<any>, elems: IElem[]) {
   if (!sets) {
     return [];
   }
@@ -29,8 +34,8 @@ export function fixSets(sets: ISets<any>, elems: any[]) {
 
 export function fixCombinations(
   combinations: GenerateSetCombinationsOptions | ISetCombinations<any> | undefined,
-  sets: ISets<any>,
-  elems: any[]
+  sets: ISets<IElem>,
+  elems: IElem[]
 ) {
   if (!combinations) {
     return null;
@@ -60,9 +65,9 @@ export function fixCombinations(
 
 export function resolveSet(
   set: number[] | { name: string; type: string },
-  sets: ISets<any>,
-  combinations: ISetCombinations<any>,
-  elems: any[]
+  sets: ISets<IElem>,
+  combinations: ISetCombinations<IElem>,
+  elems: IElem[]
 ) {
   if (Array.isArray(set)) {
     return set.map((i) => elems[i]);

@@ -64,7 +64,7 @@ def _sort_combinations(
         if isinstance(order_by, str)
         else [to_key(v) for v in order_by]
     )
-    out_list = sorted(combinations, key=lambda s: tuple(*[k(s) for k in keys]))
+    out_list = sorted(combinations, key=lambda s: tuple([k(s) for k in keys]))
     if limit is not None:
         return out_list[:limit]
     return out_list
@@ -453,7 +453,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     def from_dataframe(
         self,
         data_frame: t.Any,
-        attributes: t.Union[t.List[str], t.Any],
+        attributes: t.Union[t.Sequence[str], t.Any, None] = None,
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
     ):
@@ -478,14 +478,17 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self.selection = None
         self.sets = _sort_sets(base_sets, order_by, limit)
 
-        attribute_df = (
-            data_frame[attributes]
-            if isinstance(attributes, (list, tuple))
-            else attributes
-        )
-        self.attrs = OrderedDict(
-            [(name, series.tolist()) for name, series in attribute_df.items()]
-        )
+        if attributes is not None:
+            attribute_df = (
+                data_frame[attributes]
+                if isinstance(attributes, (list, tuple))
+                else attributes
+            )
+            self.attrs = OrderedDict(
+                [(name, series.tolist()) for name, series in attribute_df.items()]
+            )
+        else:
+            self.attrs = OrderedDict()
 
         return self.generate_intersections(order_by=order_by)
 
