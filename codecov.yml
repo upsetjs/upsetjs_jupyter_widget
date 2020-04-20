@@ -9,4 +9,4 @@ coverage:
       default:
         target: 0%
 ignore:
-  - "upsetjs_jupyter_widget/tests"
+  - 'upsetjs_jupyter_widget/tests'
