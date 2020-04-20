@@ -11,6 +11,7 @@ import {
   renderUpSet,
   UpSetProps,
   UpSetQuery,
+  //boxplotAddon
 } from '@upsetjs/bundle';
 import { fixCombinations, fixSets, resolveSet } from './utils';
 

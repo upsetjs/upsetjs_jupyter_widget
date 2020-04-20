@@ -5,6 +5,7 @@ UpSet.js Jupyter Widget
 """
 
 import typing as t
+from collections import OrderedDict
 
 from ipywidgets import DOMWidget, Layout, ValueWidget, register
 from traitlets import Bool, Dict, Enum, Float, Int, List, Tuple, Unicode, Union, default
@@ -49,14 +50,13 @@ def _sort_combinations(
     def to_key(order: str):
         if order == "cardinality":
             return lambda s: -s.cardinality
-        elif order == "degree":
+        if order == "degree":
             return lambda s: -s.degree
-        elif order == "group":
+        if order == "group":
             return lambda c: next(
                 (i for i, s in enumerate(sets) if s in c.sets), len(sets)
             )
-        else:
-            return lambda s: s.name
+        return lambda s: s.name
 
     keys = (
         [to_key(order_by)]
@@ -103,6 +103,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
 
     elems: t.List[T] = List(default_value=[]).tag(sync=True)
     _elem_to_index: t.Dict[T, int] = {}
+
+    attrs: t.Dict[str, t.List[float]] = Dict().tag(sync=True)
 
     _sets_obj: t.List[UpSetSet[T]] = []
     _sets: t.List[t.Mapping] = List(Dict(), default_value=[],).tag(sync=True)
@@ -441,12 +443,14 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         ]
         self.clear_queries()
         self.selection = None
-        self.sets = t.cast(t.Any, _sort_sets(base_sets, order_by, limit))
+        self.sets = _sort_sets(base_sets, order_by, limit)
+        self.attrs = OrderedDict()
         return self.generate_intersections(order_by=order_by)
 
     def from_dataframe(
         self,
         data_frame: t.Any,
+        attributes: t.Union[t.List[str], t.Any],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
     ):
@@ -460,10 +464,26 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
             elems = series[series.astype(bool)].index
             return UpSetSet[T](name=name, elems=frozenset(elems))
 
-        base_sets = [to_set(name, series) for name, series in data_frame.items()]
+        attribute_columns = attributes if isinstance(attributes, (list, tuple)) else []
+
+        base_sets = [
+            to_set(name, series)
+            for name, series in data_frame.items()
+            if name not in attribute_columns
+        ]
         self.clear_queries()
         self.selection = None
         self.sets = _sort_sets(base_sets, order_by, limit)
+
+        attribute_df = (
+            data_frame[attributes]
+            if isinstance(attributes, (list, tuple))
+            else attributes
+        )
+        self.attrs = OrderedDict(
+            [(name, series.tolist()) for name, series in attribute_df.items()]
+        )
+
         return self.generate_intersections(order_by=order_by)
 
     def generate_intersections(
