@@ -82,7 +82,15 @@ jobs:
           find . -type f -name "*.html" -print0 | xargs -0 sed -i 's/"_/"/g'
 
       - name: Deploy
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/develop'
+        # move to next directory
+        run: |
+          mv public public2
+          mkdir -p public
+          mv public2 public/next
+
+      - name: Deploy
+        if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
