@@ -27,15 +27,43 @@ __all__ = ["UpSetWidget"]
 
 
 def _sort_sets(
-    sets: t.Sequence[UpSetSetLike[T]], order_by: str, limit: t.Optional[int] = None,
-) -> t.List[UpSetSetLike[T]]:
-    out_list: t.List[UpSetSetLike[T]]
+    sets: t.Sequence[UpSetSet[T]], order_by: str, limit: t.Optional[int] = None,
+) -> t.List[UpSetSet[T]]:
+    key = None
     if order_by == "cardinality":
-        out_list = sorted(sets, key=lambda s: s.cardinality, reverse=True)
-    elif order_by == "degree":
-        out_list = sorted(sets, key=lambda s: s.degree, reverse=True)
+        key = lambda s: (-s.cardinality, s.name)
     else:
-        out_list = list(sets)
+        key = lambda s: s.name
+    out_list = sorted(sets, key=key)
+    if limit is not None:
+        return out_list[:limit]
+    return out_list
+
+
+def _sort_combinations(
+    combinations: t.Sequence[UpSetSetCombination[T]],
+    sets: t.Sequence[UpSetSet[T]],
+    order_by: t.Union[str, t.Sequence[str]],
+    limit: t.Optional[int] = None,
+) -> t.List[UpSetSetCombination[T]]:
+    def to_key(order: str):
+        if order == "cardinality":
+            return lambda s: -s.cardinality
+        elif order == "degree":
+            return lambda s: -s.degree
+        elif order == "group":
+            return lambda c: next(
+                (i for i, s in enumerate(sets) if s in c.sets), len(sets)
+            )
+        else:
+            return lambda s: s.name
+
+    keys = (
+        [to_key(order_by)]
+        if isinstance(order_by, str)
+        else [to_key(v) for v in order_by]
+    )
+    out_list = sorted(combinations, key=lambda s: tuple(*[k(s) for k in keys]))
     if limit is not None:
         return out_list[:limit]
     return out_list
@@ -435,7 +463,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         base_sets = [to_set(name, series) for name, series in data_frame.items()]
         self.clear_queries()
         self.selection = None
-        self.sets = t.cast(t.Any, _sort_sets(base_sets, order_by, limit))
+        self.sets = _sort_sets(base_sets, order_by, limit)
         return self.generate_intersections(order_by=order_by)
 
     def generate_intersections(
@@ -443,7 +471,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         min_degree: int = 0,
         max_degree: t.Optional[int] = None,
         empty: bool = False,
-        order_by: str = "cardinality",
+        order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         limit: t.Optional[int] = None,
     ):
         """
@@ -453,8 +481,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
             self.sets, min_degree, max_degree, empty, self.elems
         )
 
-        self.combinations = t.cast(
-            t.Any, _sort_sets(set_intersections, order_by, limit)
+        self.combinations = _sort_combinations(
+            set_intersections, self.sets, order_by, limit
         )
         return self
 
@@ -463,7 +491,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         min_degree: int = 0,
         max_degree: t.Optional[int] = None,
         empty: bool = False,
-        order_by: str = "cardinality",
+        order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         limit: t.Optional[int] = None,
     ):
         """
@@ -473,5 +501,5 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
             self.sets, min_degree, max_degree, empty, self.elems
         )
 
-        self.combinations = t.cast(t.Any, _sort_sets(set_unions, order_by, limit))
+        self.combinations = _sort_combinations(set_unions, self.sets, order_by, limit)
         return self

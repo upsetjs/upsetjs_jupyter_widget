@@ -76,10 +76,13 @@ class UpSetSet(UpSetBaseSet[T]):
 
 class UpSetSetCombination(UpSetBaseSet[T]):
     """
-    a set cobmination within UpSet like an intersection
+    a set combination within UpSet like an intersection
     """
 
     sets: t.FrozenSet[UpSetSet[T]]
+    """
+    the set of UpSetSets this set combination is composed of
+    """
 
     def __init__(
         self,

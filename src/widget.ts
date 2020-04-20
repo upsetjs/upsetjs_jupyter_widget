@@ -149,7 +149,7 @@ export class UpSetView extends DOMWidgetView {
       props.selection = resolveSet(
         delta.selection,
         props.sets ?? [],
-        props.combinations ?? ([] as ISetCombinations<any>),
+        (props.combinations ?? []) as ISetCombinations<any>,
         this.elems
       );
     }
@@ -160,7 +160,7 @@ export class UpSetView extends DOMWidgetView {
             set: resolveSet(
               query.set,
               props.sets ?? [],
-              props.combinations ?? ([] as ISetCombinations<any>),
+              (props.combinations ?? []) as ISetCombinations<any>,
               this.elems
             )!,
           });
