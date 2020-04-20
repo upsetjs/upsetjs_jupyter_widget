@@ -13,7 +13,7 @@ import {
   UpSetQuery,
   //boxplotAddon
 } from '@upsetjs/bundle';
-import { fixCombinations, fixSets, resolveSet } from './utils';
+import { fixCombinations, fixSets, resolveSet, fromIndicesArray } from './utils';
 
 export class UpSetModel extends DOMWidgetModel {
   defaults() {
@@ -167,7 +167,7 @@ export class UpSetView extends DOMWidgetView {
           });
         } else if (isElemQuery(query)) {
           return Object.assign({}, query, {
-            elems: Array.from(query.elems).map((i) => this.elems[i]),
+            elems: fromIndicesArray(query.elems as any[], this.elems),
           });
         }
         return query;

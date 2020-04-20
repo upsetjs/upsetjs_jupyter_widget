@@ -22,6 +22,7 @@ from ._model import (
     UpSetSetUnion,
 )
 from ._generate import generate_unions, generate_intersections
+from ._array import compress_index_array
 
 
 __all__ = ["UpSetWidget"]
@@ -308,7 +309,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
                 type=str(s.set_type),
                 name=s.name,
                 cardinality=s.cardinality,
-                elems=[self._elem_to_index[e] for e in s.elems],
+                elems=compress_index_array(self._elem_to_index[e] for e in s.elems),
             )
             for s in self._sets_obj
         ]
@@ -330,7 +331,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
                 cardinality=s.cardinality,
                 degree=s.degree,
                 set_names=[c.name for c in s.sets],
-                elems=[self._elem_to_index[e] for e in s.elems],
+                elems=compress_index_array(self._elem_to_index[e] for e in s.elems),
             )
             for s in self._combinations_obj
         ]
@@ -384,7 +385,9 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         if query.set:
             query_dict["set"] = dict(name=query.set.name, type=str(query.set.set_type))
         else:
-            query_dict["elems"] = [self._elem_to_index[e] for e in query.elems or []]
+            query_dict["elems"] = compress_index_array(
+                self._elem_to_index[e] for e in query.elems or []
+            )
         return query_dict
 
     @property

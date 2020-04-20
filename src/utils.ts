@@ -7,6 +7,13 @@ import {
   ISets,
 } from '@upsetjs/bundle';
 
+export function fromIndicesArray<T>(arr: number[] | string, elems: ReadonlyArray<T>): ReadonlyArray<T> {
+  if (typeof arr === 'string') {
+    return []; // TODO use library version
+  }
+  return arr.map((i) => elems[i]);
+}
+
 export function fixSets(sets: ISets<any>, elems: any[]) {
   if (!sets) {
     return [];
@@ -14,7 +21,7 @@ export function fixSets(sets: ISets<any>, elems: any[]) {
   return asSets(
     sets.map((set) =>
       Object.assign({}, set, {
-        elems: set.elems.map((i) => elems[i]),
+        elems: fromIndicesArray(set.elems, elems),
       })
     )
   );
@@ -43,7 +50,7 @@ export function fixCombinations(
   return asCombinations(
     combinations.map((set) =>
       Object.assign({}, set, {
-        elems: set.elems.map((i: number) => elems[i]),
+        elems: fromIndicesArray(set.elems, elems),
       })
     ),
     'composite',
