@@ -7,7 +7,7 @@ import {
   ISets,
 } from '@upsetjs/bundle';
 
-export function fromIndicesArray<T>(arr: number[] | string, elems: ReadonlyArray<T>): ReadonlyArray<T> {
+export function fromIndicesArray<T>(arr: ReadonlyArray<number> | string, elems: ReadonlyArray<T>): ReadonlyArray<T> {
   if (typeof arr === 'string') {
     return []; // TODO use library version
   }
