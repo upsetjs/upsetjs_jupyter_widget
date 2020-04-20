@@ -135,10 +135,10 @@ export class UpSetView extends DOMWidgetView {
     }
 
     if (delta.sets != null) {
-      props.sets = fixSets(props.sets, this.elems);
+      props.sets = fixSets(delta.sets, this.elems);
     }
     if (delta.combinations != null) {
-      const c = fixCombinations(props.combinations, props.sets, this.elems);
+      const c = fixCombinations(delta.combinations, props.sets, this.elems);
       if (c == null) {
         delete props.combinations;
       } else {
@@ -148,8 +148,8 @@ export class UpSetView extends DOMWidgetView {
     if (delta.selection) {
       props.selection = resolveSet(
         delta.selection,
-        props.sets,
-        props.combinations as ISetCombinations<any>,
+        props.sets ?? [],
+        props.combinations ?? ([] as ISetCombinations<any>),
         this.elems
       );
     }
@@ -157,7 +157,12 @@ export class UpSetView extends DOMWidgetView {
       props.queries = delta.queries.map((query: UpSetQuery<any>) => {
         if (isSetQuery(query)) {
           return Object.assign({}, query, {
-            set: resolveSet(query.set, props.sets, props.combinations as ISetCombinations<any>, this.elems)!,
+            set: resolveSet(
+              query.set,
+              props.sets ?? [],
+              props.combinations ?? ([] as ISetCombinations<any>),
+              this.elems
+            )!,
           });
         } else if (isElemQuery(query)) {
           return Object.assign({}, query, {

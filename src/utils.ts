@@ -25,7 +25,7 @@ export function fixCombinations(
   sets: ISets<any>,
   elems: any[]
 ) {
-  if (!combinations || (Array.isArray(combinations) && combinations.length === 0)) {
+  if (!combinations) {
     return null;
   }
   if (!Array.isArray(combinations)) {

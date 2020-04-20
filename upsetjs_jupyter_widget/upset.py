@@ -53,8 +53,17 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     _view_module = Unicode(MODULE_NAME).tag(sync=True)
     _view_module_version = Unicode(MODULE_VERSION).tag(sync=True)
 
+    """
+    interactivity mode of the widget whether the plot is static, reacts on hover or click events
+    """
     mode: str = Enum(("hover", "click", "static"), default_value="hover").tag(sync=True)
+    """
+    padding within the svg
+    """
     padding: float = Float(None, allow_none=True).tag(sync=True)
+    """
+    padding argument for scaleBand (0..1)
+    """
     bar_padding: float = Float(None, allow_none=True).tag(sync=True)
     dot_padding: float = Float(None, allow_none=True).tag(sync=True)
     width_ratios: t.Tuple[float, float, float] = Tuple(
