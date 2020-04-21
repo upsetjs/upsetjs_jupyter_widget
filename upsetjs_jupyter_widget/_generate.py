@@ -30,7 +30,7 @@ def generate_intersections(
         return first
 
     set_intersections: t.List[UpSetSetIntersection[T]] = []
-    for i in range(min_degree, len(sets) if max_degree is None else max_degree):
+    for i in range(min_degree, len(sets) if max_degree is None else (max_degree + 1)):
         for combo in combinations(sets, i):
             set_list = list(combo)
             degree = len(set_list)
@@ -72,7 +72,7 @@ def generate_unions(
         return first
 
     set_unions: t.List[UpSetSetUnion[T]] = []
-    for i in range(min_degree, len(sets) if max_degree is None else max_degree):
+    for i in range(min_degree, len(sets) if max_degree is None else (max_degree + 1)):
         for combo in combinations(sets, i):
             set_list = list(combo)
             degree = len(set_list)
