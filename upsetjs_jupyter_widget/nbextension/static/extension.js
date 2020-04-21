@@ -6,7 +6,7 @@ define(function () {
   window['requirejs'].config({
     map: {
       '*': {
-        upsetjs_jupyter_widget: 'nbextensions/upsetjs_jupyter_widget/index',
+        '@upsetjs/jupyter_widget': 'nbextensions/@upsetjs/jupyter_widget/index',
       },
     },
   });

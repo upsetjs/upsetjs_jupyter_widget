@@ -14,10 +14,15 @@ You can install using `pip`:
 pip install upsetjs_jupyter_widget
 ```
 
-Or if you use jupyterlab:
+enable in jupyter notebooks:
 
 ```bash
-pip install upsetjs_jupyter_widget
+jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
+```
+
+jupyter lab requires a dependency
+
+```bash
 jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0
 ```
 
@@ -77,6 +82,8 @@ pipenv
 ```sh
 pipenv shell
 pip install -e .
+jupyter nbextension install --sys-prefix --overwrite --py upsetjs_jupyter_widget
+jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
 pipenv run jupyter labextension install .
 ```
 
