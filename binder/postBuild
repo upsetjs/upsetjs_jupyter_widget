@@ -3,4 +3,5 @@ set -ex
 
 # Install JupyterLab extension
 jupyter nbextension enable --py widgetsnbextension
+jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
 jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0 @upsetjs/jupyter_widget
