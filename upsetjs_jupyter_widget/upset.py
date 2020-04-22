@@ -52,7 +52,7 @@ def _sort_combinations(
         if order == "cardinality":
             return lambda s: -s.cardinality
         if order == "degree":
-            return lambda s: -s.degree
+            return lambda s: s.degree
         if order == "group":
             return lambda c: next(
                 (i for i, s in enumerate(sets) if s in c.sets), len(sets)
