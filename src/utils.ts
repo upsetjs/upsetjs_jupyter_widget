@@ -5,18 +5,12 @@ import {
   GenerateSetCombinationsOptions,
   ISetCombinations,
   ISets,
+  fromIndicesArray,
 } from '@upsetjs/bundle';
 
 export interface IElem {
   name: string;
   attrs: { [key: string]: number };
-}
-
-export function fromIndicesArray<T>(arr: ReadonlyArray<number> | string, elems: ReadonlyArray<T>): ReadonlyArray<T> {
-  if (typeof arr === 'string') {
-    return []; // TODO use library version
-  }
-  return arr.map((i) => elems[i]);
 }
 
 export function fixSets(sets: ISets<any>, elems: IElem[]) {

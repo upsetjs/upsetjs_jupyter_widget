@@ -12,8 +12,9 @@ import {
   UpSetProps,
   UpSetQuery,
   boxplotAddon,
+  fromIndicesArray,
 } from '@upsetjs/bundle';
-import { fixCombinations, fixSets, resolveSet, fromIndicesArray, IElem } from './utils';
+import { fixCombinations, fixSets, resolveSet, IElem } from './utils';
 
 export class UpSetModel extends DOMWidgetModel {
   defaults() {
