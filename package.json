@@ -63,7 +63,7 @@
     "release:patch": "release-it --disable-metrics patch"
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^2 || ^3 || ^4.0.0-alpha.0",
+    "@jupyter-widgets/base": ">=2",
     "@upsetjs/bundle": "^0.4.2"
   },
   "devDependencies": {
