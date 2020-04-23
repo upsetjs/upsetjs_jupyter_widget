@@ -90,20 +90,12 @@ export class UpSetView extends DOMWidgetView {
       if (key === 'value') {
         return 'selection';
       }
-      if (key.startsWith('_')) {
-        return toCamelCase(key.slice(1));
-      }
       return toCamelCase(key);
     };
 
     Object.keys(state).forEach((key) => {
       let v = state[key] as any;
-      if (
-        v == null ||
-        (Array.isArray(v) && v.length === 0) ||
-        (key.startsWith('_') && key !== '_queries' && key !== '_sets' && key !== '_combinations') ||
-        key === 'layout'
-      ) {
+      if (v == null || (Array.isArray(v) && v.length === 0) || key.startsWith('_') || key === 'layout') {
         return;
       }
       const propName = toPropName(key);

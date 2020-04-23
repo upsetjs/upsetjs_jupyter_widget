@@ -8,7 +8,20 @@ import typing as t
 from collections import OrderedDict
 
 from ipywidgets import DOMWidget, Layout, ValueWidget, register
-from traitlets import Bool, Dict, Enum, Float, Int, List, Tuple, Unicode, Union, default
+from ipywidgets.widgets.trait_types import Color
+from traitlets import (
+    Bool,
+    Dict,
+    Enum,
+    Float,
+    Int,
+    List,
+    Tuple,
+    Unicode,
+    Union,
+    default,
+    Instance,
+)
 
 from ._frontend import MODULE_NAME, MODULE_VERSION
 from ._model import (
@@ -70,6 +83,46 @@ def _sort_combinations(
     return out_list
 
 
+def _to_set_list(arr: t.List[UpSetSet], model: "UpSetWidget"):
+    return [
+        dict(
+            type=str(s.set_type),
+            name=s.name,
+            cardinality=s.cardinality,
+            elems=compress_index_array(model.elem_to_index[e] for e in s.elems),
+        )
+        for s in arr
+    ]
+
+
+def _to_combination_list(arr: t.List[UpSetSetCombination], model: "UpSetWidget"):
+    return [
+        dict(
+            type=str(s.set_type),
+            name=s.name,
+            cardinality=s.cardinality,
+            degree=s.degree,
+            set_names=[c.name for c in s.sets],
+            elems=compress_index_array(model.elem_to_index[e] for e in s.elems),
+        )
+        for s in arr
+    ]
+
+
+def _to_query_list(arr: t.List[UpSetQuery], model: "UpSetWidget"):
+    def _to_query(query: UpSetQuery):
+        query_dict: t.Dict = dict(name=query.name, color=query.color)
+        if query.set:
+            query_dict["set"] = dict(name=query.set.name, type=str(query.set.set_type))
+        else:
+            query_dict["elems"] = compress_index_array(
+                model.elem_to_index[e] for e in query.elems or []
+            )
+        return query_dict
+
+    return [_to_query(q) for q in arr]
+
+
 @register
 class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     """UpSet Widget
@@ -103,31 +156,34 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     ).tag(sync=True)
 
     elems: t.List[T] = List(default_value=[]).tag(sync=True)
-    _elem_to_index: t.Dict[T, int] = {}
+    elem_to_index: t.Dict[T, int] = {}
 
     attrs: t.Dict[str, t.List[float]] = Dict().tag(sync=True)
 
-    _sets_obj: t.List[UpSetSet[T]] = []
-    _sets: t.List[t.Mapping] = List(Dict(), default_value=[],).tag(sync=True)
+    sets: t.List[UpSetSet[T]] = List(Instance(UpSetSet), default_value=[],).tag(
+        sync=True, to_json=_to_set_list
+    )
 
-    _combinations_obj: t.List[UpSetSetCombination[T]] = []
-    _combinations: t.List[t.Mapping] = List(Dict(), default_value=[],).tag(sync=True)
+    combinations: t.List[UpSetSetCombination[T]] = List(
+        Instance(UpSetSetCombination), default_value=[],
+    ).tag(sync=True, to_json=_to_combination_list)
 
     value: t.Union[None, t.Mapping, t.List[int]] = Union(
         (Dict(allow_none=True, default_value=None), List(Int(), default_value=[]))
     ).tag(sync=True)
     _selection: t.Union[None, t.FrozenSet[T], UpSetSetLike[T]] = None
 
-    _queries_obj: t.List[UpSetQuery[T]] = []
-    _queries: t.List[t.Mapping] = List(Dict(), default_value=[]).tag(sync=True)
+    queries: t.List[UpSetQuery[T]] = List(Instance(UpSetQuery), default_value=[]).tag(
+        sync=True, to_json=_to_query_list
+    )
 
     theme: str = Enum(("light", "dark"), default_value="light").tag(sync=True)
-    selection_color: str = Unicode(None, allow_none=True).tag(sync=True)
-    alternating_background_color: str = Unicode(None, allow_none=True).tag(sync=True)
-    color: str = Unicode(None, allow_none=True).tag(sync=True)
-    text_color: str = Unicode(None, allow_none=True).tag(sync=True)
-    hover_hint_color: str = Unicode(None, allow_none=True).tag(sync=True)
-    not_member_color: str = Unicode(None, allow_none=True).tag(sync=True)
+    selection_color: str = Color(None, allow_none=True).tag(sync=True)
+    alternating_background_color: str = Color(None, allow_none=True).tag(sync=True)
+    color: str = Color(None, allow_none=True).tag(sync=True)
+    text_color: str = Color(None, allow_none=True).tag(sync=True)
+    hover_hint_color: str = Color(None, allow_none=True).tag(sync=True)
+    not_member_color: str = Color(None, allow_none=True).tag(sync=True)
 
     bar_label_offset: float = Float(None, allow_none=True).tag(sync=True)
     set_name_axis_offset: float = Float(None, allow_none=True).tag(sync=True)
@@ -175,7 +231,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         """
         clone = UpSetWidget[T](  # pylint: disable=unsubscriptable-object
             clonee=dict(
-                _elem_to_index=self._elem_to_index.copy(),
+                _elem_to_index=self.elem_to_index.copy(),
                 _sets_obj=list(self._sets_obj),
                 _sets=list(self._sets),
                 _combinations_obj=list(self._combinations_obj),
@@ -283,7 +339,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         if value is None:
             self.value = None
         elif isinstance(value, (list, set, frozenset)):
-            self.value = [self._elem_to_index[e] for e in value]
+            self.value = [self.elem_to_index[e] for e in value]
         elif isinstance(value, UpSetSet):
             self.value = dict(type="set", name=value.name)
         else:
@@ -294,72 +350,17 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         # unknown
         self.observe(self._sync_value, "value")
 
-    @property
-    def sets(self) -> t.Sequence[UpSetSet[T]]:
-        """
-        the UpSet list of sets
-        """
-        return self._sets_obj
-
-    @sets.setter
-    def sets(self, value: t.List[UpSetSet[T]]):
-        self._sets_obj = value
-        self._sets = [
-            dict(
-                type=str(s.set_type),
-                name=s.name,
-                cardinality=s.cardinality,
-                elems=compress_index_array(self._elem_to_index[e] for e in s.elems),
-            )
-            for s in self._sets_obj
-        ]
-
-    @property
-    def combinations(self) -> t.Sequence[UpSetSetCombination[T]]:
-        """
-        the UpSet list of set combinations
-        """
-        return self._combinations_obj
-
-    @combinations.setter
-    def combinations(self, value: t.List[UpSetSetCombination[T]]):
-        self._combinations_obj = value
-        self._combinations = [
-            dict(
-                type=str(s.set_type),
-                name=s.name,
-                cardinality=s.cardinality,
-                degree=s.degree,
-                set_names=[c.name for c in s.sets],
-                elems=compress_index_array(self._elem_to_index[e] for e in s.elems),
-            )
-            for s in self._combinations_obj
-        ]
-
     def on_selection_changed(self, callback):
         """
         add callback listener to listen for selection changes
         """
         self.observe(lambda _: callback(self.selection), "value")
 
-    @property
-    def queries(self):
-        """
-        current list of UpSet queries
-        """
-        return self._queries_obj
-
-    @queries.setter
-    def queries(self, value: t.List[UpSetQuery[T]]):
-        self._queries_obj = value
-        self._queries = [self._to_query(v) for v in value]
-
     def clear_queries(self):
         """
         deletes the list of queries
         """
-        self._queries = []
-        self._queries_obj = []
+        self.queries = []
 
     def append_query(
         self,
@@ -376,19 +377,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
             query = UpSetQuery[T](name, color, upset=upset)
         else:
             query = UpSetQuery[T](name, color, elems=elems or frozenset())
-        self._queries_obj.append(query)
-        self._queries = self._queries + [self._to_query(query)]
+        self.queries = self.queries + [query]
         return self
-
-    def _to_query(self, query: UpSetQuery[T]):
-        query_dict: t.Dict = dict(name=query.name, color=query.color)
-        if query.set:
-            query_dict["set"] = dict(name=query.set.name, type=str(query.set.set_type))
-        else:
-            query_dict["elems"] = compress_index_array(
-                self._elem_to_index[e] for e in query.elems or []
-            )
-        return query_dict
 
     @property
     def width(self) -> t.Union[str, int]:
@@ -439,7 +429,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         for set_elems in sets.values():
             elems.update(set_elems)
         self.elems = sorted(elems)
-        self._elem_to_index = {e: i for i, e in enumerate(self.elems)}
+        self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
 
         base_sets: t.List[UpSetSet[T]] = [
             UpSetSet[T](name=k, elems=frozenset(v)) for k, v in sets.items()
@@ -461,7 +451,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         generates the list of sets from a dataframe
         """
         self.elems = sorted(data_frame.index)
-        self._elem_to_index = {e: i for i, e in enumerate(self.elems)}
+        self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
 
         def to_set(name: str, series):
             elems = series[series.astype(bool)].index
