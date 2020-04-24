@@ -135,6 +135,8 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
     _view_module = Unicode(MODULE_NAME).tag(sync=True)
     _view_module_version = Unicode(MODULE_VERSION).tag(sync=True)
 
+    description: str = Unicode("", help="Description of the control.").tag(sync=True)
+
     """
     interactivity mode of the widget whether the plot is static, reacts on hover or click events
     """
@@ -217,6 +219,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         """
         clone = UpSetWidget[T]()  # pylint: disable=unsubscriptable-object
 
+        clone.description = self.description
         clone.mode = self.mode
         clone.padding = self.padding
         clone.bar_padding = self.bar_padding
