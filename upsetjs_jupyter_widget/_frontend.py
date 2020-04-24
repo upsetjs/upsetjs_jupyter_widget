@@ -5,4 +5,4 @@ Information about the frontend package of the widgets.
 """
 
 MODULE_NAME = "@upsetjs/jupyter_widget"
-MODULE_VERSION = "^0.5.0"
+MODULE_VERSION = "^0.5.1"
