@@ -2,7 +2,7 @@
   "name": "@upsetjs/jupyter_widget",
   "version": "0.4.2",
   "description": "A Jupyter Widget Library around UpSet.js",
-  "license": "AGPL-3.0",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "author": {
     "name": "Samuel Gratzl",
     "email": "sam@sgratzl.com",
