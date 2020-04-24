@@ -42,7 +42,7 @@ jstargets = [
 package_data_spec = {name: ["nbextension/static/*.*js*", "labextension/*.tgz"]}
 
 data_files_spec = [
-    ("share/jupyter/nbextensions/upsetjs_jupyter_widget", nb_path, "*.js*"),
+    ("share/jupyter/nbextensions/@upsetjs/jupyter_widget", nb_path, "*.js*"),
     ("share/jupyter/lab/extensions", lab_path, "*.tgz"),
     ("etc/jupyter/nbconfig/notebook.d", HERE, "upsetjs_jupyter_widget.json"),
 ]
