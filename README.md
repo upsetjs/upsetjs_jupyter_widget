@@ -72,7 +72,7 @@ interact(selection_changed, s=w)
 
 see also [introduction.ipynb](./master/examples/introduction.ipynb)
 
-see also [![Open in NBViewer][nbviewer]][nbviewer-url] [![Open in Binder][binder]][binder-url]
+see also ![Open in NBViewer][nbviewer]][nbviewer-url] ![Open in Binder][binder]][binder-url]
 
 ## Dev Environment
 
