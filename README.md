@@ -118,6 +118,8 @@ yarn build
 
 based on release-it
 
+**within the pipenv**
+
 ```sh
 yarn release-major
 yarn release-minor
