@@ -1,7 +1,7 @@
 {
   "name": "@upsetjs/jupyter_widget",
   "version": "0.5.1",
-  "description": "A Jupyter Widget Library around UpSet.js",
+  "description": "UpSet.js is a re-implementation of UpSetR to create interactive set visualizations for more than three sets",
   "license": "SEE LICENSE IN LICENSE.txt",
   "author": {
     "name": "Samuel Gratzl",
