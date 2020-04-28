@@ -4447,22 +4447,22 @@ fsevents@^2.1.2:
 
 "fsevents@patch:fsevents@^1.2.7#builtin<compat/fsevents>":
   version: 1.2.12
-  resolution: "fsevents@patch:fsevents@npm%3A1.2.12#builtin<compat/fsevents>::version=1.2.12&hash=77dfe6"
+  resolution: "fsevents@patch:fsevents@npm%3A1.2.12#builtin<compat/fsevents>::version=1.2.12&hash=495457"
   dependencies:
     bindings: ^1.5.0
     nan: ^2.12.1
     node-gyp: latest
     node-pre-gyp: "*"
-  checksum: 2/f873bb718e0a886c4de803c7282f7379035eaef9955d11c133aa06a44e266801b437dd842115c5f304ee321b2c3444d8526f3c92098d6ffb1dfa203f547ffe82
+  checksum: 2/181d9f88933413ce7653288b743abae38bb12d4327552698dcfa4663583933f79e63e8ce0ec7987ca087e0c49add8f05e735d17ada20bd406403fa603ded93c2
   languageName: node
   linkType: hard
 
 "fsevents@patch:fsevents@^2.1.2#builtin<compat/fsevents>":
   version: 2.1.2
-  resolution: "fsevents@patch:fsevents@npm%3A2.1.2#builtin<compat/fsevents>::version=2.1.2&hash=77dfe6"
+  resolution: "fsevents@patch:fsevents@npm%3A2.1.2#builtin<compat/fsevents>::version=2.1.2&hash=495457"
   dependencies:
     node-gyp: latest
-  checksum: 2/8e95236543caafaff54d239eb6d71a7d4827bbb14a9addf5fac11f37fa2c5f91cc84fc60e532403e291175c1745b524e355fee99c3e054ead1f85bdbac55c893
+  checksum: 2/6fb6ae0c1e5aca68fec6c0bf119d0dc9a1d653af60925c7ec69868f0ac68fa6930eeb769745030ecb560e00c144c74068da62bb77a000cc7dc263963ba4e2d7f
   languageName: node
   linkType: hard
 
@@ -8385,17 +8385,17 @@ resolve@1.1.7:
 
 "resolve@patch:resolve@1.1.7#builtin<compat/resolve>":
   version: 1.1.7
-  resolution: "resolve@patch:resolve@npm%3A1.1.7#builtin<compat/resolve>::version=1.1.7&hash=8fccd0"
-  checksum: 2/876dac138d8a549b2750766bb2289041d00df2810daddb983d1b94eb0014b009f4e54e871afd5f86022a54597a168d1ba3c219e21066e5081bbba072e5ff35af
+  resolution: "resolve@patch:resolve@npm%3A1.1.7#builtin<compat/resolve>::version=1.1.7&hash=e7677c"
+  checksum: 2/5238277188664a6948dd7288d16f1a09e098fb36d4f9b2c749130969c998faa9bccefd30fd618073af5210fdc768730cadfc15588bbee4fc64b257f20cab6783
   languageName: node
   linkType: hard
 
 "resolve@patch:resolve@1.x#builtin<compat/resolve>, resolve@patch:resolve@^1.1.6#builtin<compat/resolve>, resolve@patch:resolve@^1.10.0#builtin<compat/resolve>, resolve@patch:resolve@^1.12.0#builtin<compat/resolve>, resolve@patch:resolve@^1.13.1#builtin<compat/resolve>, resolve@patch:resolve@^1.15.1#builtin<compat/resolve>, resolve@patch:resolve@^1.3.2#builtin<compat/resolve>":
   version: 1.15.1
-  resolution: "resolve@patch:resolve@npm%3A1.15.1#builtin<compat/resolve>::version=1.15.1&hash=8fccd0"
+  resolution: "resolve@patch:resolve@npm%3A1.15.1#builtin<compat/resolve>::version=1.15.1&hash=e7677c"
   dependencies:
     path-parse: ^1.0.6
-  checksum: 2/dceab9e78d618d4ebcef66c1c4c8bb28bc242fbb95625a498d759b6aaac00de0ebb91e9d6560f5f49ac073ab9e9e3e7450449b4bddf740ba8cb267b8b68ea70f
+  checksum: 2/fe7e72ddef33d5c157991b824ba2d439cafcd386cb4b26d86c32e77fea442bdd9a93c6cdd93ab90f87a29449008df64b53a8310dd89ebe88ea87fb5db09c03aa
   languageName: node
   linkType: hard
 
@@ -9672,11 +9672,11 @@ typescript@^3.8.3:
 
 "typescript@patch:typescript@^3.8.3#builtin<compat/typescript>":
   version: 3.8.3
-  resolution: "typescript@patch:typescript@npm%3A3.8.3#builtin<compat/typescript>::version=3.8.3&hash=270b6c"
+  resolution: "typescript@patch:typescript@npm%3A3.8.3#builtin<compat/typescript>::version=3.8.3&hash=c79188"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 2/dd473e358d618597295dced4673462c8a5ddce3a02e31199931444cdf97532548b52282130aa6b3f910b3efff45027ba20a5395908b1bd056fc5ac23f2fc6c81
+  checksum: 2/2950b292ac700898647d49ca5f07fa546f6c3d28983ba559c5b4fa360babdc1734493b7f5f72553735eaa401c850989d7bbbd70f739df3c0b7fc83c82e37d8a5
   languageName: node
   linkType: hard
 
