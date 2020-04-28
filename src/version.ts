@@ -1,4 +1,9 @@
-// Copyright (c) Samuel Gratzl
+/**
+ * @upsetjs/jupyter_widget
+ * https://github.com/upsetjs/upsetjs_jupyter_widget
+ *
+ * Copyright (c) 2020 Samuel Gratzl <sam@sgratzl.com>
+ */
 
 /**
  * The _model_module_version/_view_module_version this package implements.

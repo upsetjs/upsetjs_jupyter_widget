@@ -1,3 +1,9 @@
+# coding: utf- 8
+# @upsetjs/jupyter_widget
+# https://github.com/upsetjs/upsetjs_jupyter_widget
+#
+# Copyright (c) 2020 Samuel Gratzl <sam@sgratzl.com>
+
 # coding: utf-8
 # Copyright (c) Samuel Gratzl.
 # pylint: disable=W0221,C0103,C0116,W0212

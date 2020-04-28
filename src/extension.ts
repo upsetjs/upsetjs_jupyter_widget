@@ -1,4 +1,9 @@
-// Copyright (c) Jupyter Development Team.
+/**
+ * @upsetjs/jupyter_widget
+ * https://github.com/upsetjs/upsetjs_jupyter_widget
+ *
+ * Copyright (c) 2020 Samuel Gratzl <sam@sgratzl.com>
+ */
 
 // Entry point for the notebook bundle containing custom model definitions.
 //
