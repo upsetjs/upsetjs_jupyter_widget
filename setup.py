@@ -30,7 +30,8 @@ with open("README.md") as readme_file:
 # Ensure a valid python version
 ensure_python(">=3.6")
 
-pkg = json.load(pjoin(HERE, "package.json"))
+with open("package.json") as pkg_file:
+    pkg = json.load(pkg_file)
 
 nb_path = pjoin(HERE, name, "nbextension", "static")
 lab_path = pjoin(HERE, name, "labextension")
