@@ -4,6 +4,7 @@
 
 from __future__ import print_function
 from glob import glob
+import json
 from os.path import join as pjoin
 
 
@@ -14,7 +15,6 @@ from setupbase import (
     find_packages,
     combine_commands,
     ensure_python,
-    get_version,
     HERE,
 )
 
@@ -24,11 +24,13 @@ from setuptools import setup
 # The name of the project
 name = "upsetjs_jupyter_widget"
 
-# Ensure a valid python version
-ensure_python(">=3.4")
+with open("README.md") as readme_file:
+    readme = readme_file.read()
 
-# Get our version
-version = get_version(pjoin(name, "_version.py"))
+# Ensure a valid python version
+ensure_python(">=3.6")
+
+pkg = json.load(pjoin(HERE, 'package.json'))
 
 nb_path = pjoin(HERE, name, "nbextension", "static")
 lab_path = pjoin(HERE, name, "labextension")
@@ -55,26 +57,39 @@ cmdclass["jsdeps"] = combine_commands(
 )
 
 
-setup_args = dict(
+if __name__ == "__main__":
+  setup(
     name=name,
-    description="A Jupyter Widget Library around UpSet.js",
-    version=version,
+    description=pkg["description"],
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    version=pkg["version"],
     scripts=glob(pjoin("scripts", "*")),
     cmdclass=cmdclass,
     packages=find_packages(),
-    author="Samuel Gratzl",
-    author_email="sam@sgratzl.com",
-    url="https://github.com/upsetjs/upsetjs_jupyter_widget",
+    author=pkg["author"]["name"],
+    author_email=pkg["author"]["email"],
+    url=pkg["homepage"],
     platforms="Linux, Mac OS X, Windows",
     keywords=["Jupyter", "Widgets", "IPython"],
     classifiers=[
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
+        "Intended Audience :: System Administrators",
+        "License :: Free For Home Use",
+        "License :: Free for non-commercial use",
+        "License :: Free For Educational Use"
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Framework :: IPython",
         "Framework :: Jupyter",
+        "Topic :: Scientific/Engineering :: Information Analysis",
+        "Topic :: Scientific/Engineering :: Visualization",
+        "Typing :: Typed"
     ],
     include_package_data=True,
     install_requires=["ipywidgets>=7.5.0",],
@@ -95,7 +110,4 @@ setup_args = dict(
         ],
     },
     entry_points={},
-)
-
-if __name__ == "__main__":
-    setup(**setup_args)
+  )
