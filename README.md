@@ -121,9 +121,9 @@ based on release-it
 **within the pipenv**
 
 ```sh
-yarn release-major
-yarn release-minor
-yarn release-patch
+yarn release:major
+yarn release:minor
+yarn release:patch
 ```
 
 ## Privacy Policy
