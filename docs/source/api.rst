@@ -1,7 +1,7 @@
 API Documentation
 =================
 
-.. autoclass:: upsetjs_jupyter_widget.UpSetWidget
+.. autoclass:: upsetjs_jupyter_widget.UpSetJSWidget
    :members:
    :undoc-members:
 

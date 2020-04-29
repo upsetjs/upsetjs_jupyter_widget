@@ -42,7 +42,7 @@ from ._generate import generate_unions, generate_intersections
 from ._array import compress_index_array
 
 
-__all__ = ["UpSetWidget"]
+__all__ = ["UpSetJSWidget"]
 
 
 def _sort_sets(
@@ -87,7 +87,7 @@ def _sort_combinations(
     return out_list
 
 
-def _to_set_list(arr: t.List[UpSetSet], model: "UpSetWidget"):
+def _to_set_list(arr: t.List[UpSetSet], model: "UpSetJSWidget"):
     return [
         dict(
             type=str(s.set_type),
@@ -99,7 +99,7 @@ def _to_set_list(arr: t.List[UpSetSet], model: "UpSetWidget"):
     ]
 
 
-def _to_combination_list(arr: t.List[UpSetSetCombination], model: "UpSetWidget"):
+def _to_combination_list(arr: t.List[UpSetSetCombination], model: "UpSetJSWidget"):
     return [
         dict(
             type=str(s.set_type),
@@ -113,7 +113,7 @@ def _to_combination_list(arr: t.List[UpSetSetCombination], model: "UpSetWidget")
     ]
 
 
-def _to_query_list(arr: t.List[UpSetQuery], model: "UpSetWidget"):
+def _to_query_list(arr: t.List[UpSetQuery], model: "UpSetJSWidget"):
     def _to_query(query: UpSetQuery):
         query_dict: t.Dict = dict(name=query.name, color=query.color)
         if query.set:
@@ -128,8 +128,8 @@ def _to_query_list(arr: t.List[UpSetQuery], model: "UpSetWidget"):
 
 
 @register
-class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
-    """UpSet Widget
+class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
+    """UpSet.js Widget
     """
 
     _model_name = Unicode("UpSetModel").tag(sync=True)
@@ -217,11 +217,11 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         super().__init__(**kwargs)
         self.observe(self._sync_value, "value")
 
-    def copy(self) -> "UpSetWidget":
+    def copy(self) -> "UpSetJSWidget":
         """
         returns a copy of itself
         """
-        clone = UpSetWidget[T]()  # pylint: disable=unsubscriptable-object
+        clone = UpSetJSWidget[T]()  # pylint: disable=unsubscriptable-object
 
         clone.description = self.description
         clone.mode = self.mode
@@ -356,7 +356,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         color: str,
         upset: t.Optional[UpSetSetLike[T]] = None,
         elems: t.Optional[t.FrozenSet[T]] = None,
-    ) -> "UpSetWidget":
+    ) -> "UpSetJSWidget":
         """
         adds another UpSetQuery to be visualized
         """
@@ -409,7 +409,7 @@ class UpSetWidget(ValueWidget, DOMWidget, t.Generic[T]):
         sets: t.Dict[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
-    ) -> "UpSetWidget":
+    ) -> "UpSetJSWidget":
         """
         generates the list of sets from a dict
         """

@@ -35,12 +35,12 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0 @
 
 ```python
 from ipywidgets import interact
-from upsetjs_jupyter_widget import UpSetWidget
+from upsetjs_jupyter_widget import UpSetJSWidget
 import pandas as pd
 ```
 
 ```python
-w = UpSetWidget[str]()
+w = UpSetJSWidget[str]()
 ```
 
 ```python

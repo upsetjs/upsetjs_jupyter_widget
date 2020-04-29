@@ -13,7 +13,7 @@ import {
   ISetCombinations,
   ISetLike,
   isSetQuery,
-  renderUpSet,
+  renderUpSetJS,
   UpSetProps,
   UpSetQuery,
   boxplotAddon,
@@ -232,12 +232,12 @@ export class UpSetView extends DOMWidgetView {
         const bb2 = this.el.getBoundingClientRect();
         p.width = bb2.width || 600;
         p.height = bb2.height || 400;
-        renderUpSet(this.el, p);
+        renderUpSetJS(this.el, p);
       });
       return;
     }
     p.width = bb.width;
     p.height = bb.height;
-    renderUpSet(this.el, p);
+    renderUpSetJS(this.el, p);
   }
 }

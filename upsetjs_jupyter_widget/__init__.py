@@ -8,7 +8,7 @@
 UpSet.js Jupyter Widget
 """
 
-from .upset import UpSetWidget
+from .widget import UpSetJSWidget
 from ._model import (
     UpSetBaseSet,
     UpSetQuery,

@@ -10,12 +10,12 @@
 test case
 """
 
-from ..upset import UpSetWidget  # pylint: disable=C0415
+from ..widget import UpSetJSWidget  # pylint: disable=C0415
 
 
 def test_upset_creation_blank():
     """
     test case
     """
-    widget = UpSetWidget()
+    widget = UpSetJSWidget()
     assert widget.value is None

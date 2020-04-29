@@ -82,7 +82,7 @@ class UpSetSet(UpSetBaseSet[T]):
 
 class UpSetSetCombination(UpSetBaseSet[T]):
     """
-    a set combination within UpSet like an intersection
+    a set combination within UpSet.js like an intersection
     """
 
     sets: t.FrozenSet[UpSetSet[T]]
