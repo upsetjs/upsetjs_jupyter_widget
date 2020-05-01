@@ -189,3 +189,21 @@ class UpSetQuery(t.Generic[T]):
                 f"UpSetSetQuery(name={self.name}, color={self.color}, set={self.set})"
             )
         return f"UpSetSetQuery(name={self.name}, color={self.color}, elems={set(self.elems)})"
+
+
+class UpSetFontSizes:
+    chart_label: t.Union[None, str, int] = None
+    axis_tick: t.Union[None, str, int] = None
+    set_label: t.Union[None, str, int] = None
+    bar_label: t.Union[None, str, int] = None
+    legend: t.Union[None, str, int] = None
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.__dict__.update(kwargs)
+
+    def copy(self):
+        return UpSetFontSizes(**self.__dict__)
+
+    def to_json(self):
+        return self.__dict__

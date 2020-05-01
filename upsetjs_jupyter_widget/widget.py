@@ -37,6 +37,7 @@ from ._model import (
     UpSetSetIntersection,
     UpSetSetLike,
     UpSetSetUnion,
+    UpSetFontSizes,
 )
 from ._generate import generate_unions, generate_intersections
 from ._array import compress_index_array
@@ -198,15 +199,9 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
     query_legend: bool = Bool(None, allow_none=True).tag(sync=True)
     export_buttons: bool = Bool(None, allow_none=True).tag(sync=True)
     font_family: str = Unicode(None, allow_none=True).tag(sync=True)
-    font_sizes: t.Dict[str, str] = Dict(
-        traits=dict(
-            chart_label=Unicode(None, allow_none=True),
-            axis_tick=Unicode(None, allow_none=True),
-            set_label=Unicode(None, allow_none=True),
-            bar_label=Unicode(None, allow_none=True),
-            legend=Unicode(None, allow_none=True),
-        )
-    ).tag(sync=True)
+    font_sizes: UpSetFontSizes = Instance(UpSetFontSizes).tag(
+        sync=True, to_json=lambda v, _: v.to_json()
+    )
     numeric_scale: str = Enum(("linear", "log"), default_value="linear").tag(sync=True)
     band_scale: str = Enum(("band", "band2"), default_value="band").tag(sync=True)
 
@@ -403,6 +398,10 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
     @default("layout")
     def _default_layout(self):  # pylint: disable=no-self-use
         return Layout(height="400px", align_self="stretch")
+
+    @default("font_sizes")
+    def _default_font_sizes(self):  # pylint: disable=no-self-use
+        return UpSetFontSizes()
 
     def from_dict(
         self,

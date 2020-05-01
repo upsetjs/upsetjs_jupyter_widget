@@ -108,7 +108,10 @@ export class UpSetView extends DOMWidgetView {
       if (propName === 'fontSizes') {
         const converted: any = {};
         Object.keys(v).forEach((key: string) => {
-          converted[toCamelCase(key)] = (v as any)![key];
+          const vi = (v as any)![key];
+          if (vi != null) {
+            converted[toCamelCase(key)] = typeof vi === 'number' ? `${vi}px` : String(vi);
+          }
         });
         v = converted;
       }
