@@ -192,6 +192,10 @@ class UpSetQuery(t.Generic[T]):
 
 
 class UpSetFontSizes:
+    """
+    helper structure for specifying font sizes
+    """
+
     chart_label: t.Union[None, str, int] = None
     axis_tick: t.Union[None, str, int] = None
     set_label: t.Union[None, str, int] = None
@@ -202,8 +206,17 @@ class UpSetFontSizes:
         super().__init__()
         self.__dict__.update(kwargs)
 
+    def __copy__(self):
+        return UpSetFontSizes(**self.__dict__)
+
     def copy(self):
+        """
+        returns a copy / clone of this instance
+        """
         return UpSetFontSizes(**self.__dict__)
 
     def to_json(self):
+        """
+        converts this instance to a regular dictionary for transfering
+        """
         return self.__dict__
