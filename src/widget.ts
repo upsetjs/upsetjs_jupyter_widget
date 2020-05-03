@@ -13,7 +13,7 @@ import {
   ISetCombinations,
   ISetLike,
   isSetQuery,
-  renderUpSet as render,
+  render,
   UpSetProps,
   UpSetQuery,
   boxplotAddon,
