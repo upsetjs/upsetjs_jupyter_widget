@@ -18,6 +18,8 @@ import {
   UpSetQuery,
   boxplotAddon,
   fromIndicesArray,
+  VennDiagramProps,
+  renderVennDiagram,
 } from '@upsetjs/bundle';
 import { fixCombinations, fixSets, resolveSet, IElem } from './utils';
 
@@ -48,7 +50,7 @@ export class UpSetModel extends DOMWidgetModel {
 }
 
 export class UpSetView extends DOMWidgetView {
-  private props: UpSetProps<IElem> = {
+  private props: UpSetProps<IElem> & VennDiagramProps<IElem> = {
     sets: [],
     width: 300,
     height: 300,
@@ -86,8 +88,8 @@ export class UpSetView extends DOMWidgetView {
     this.model.on('change', this.changed_prop, this);
   };
 
-  private stateToProps(): Partial<UpSetProps<any>> {
-    const props: Partial<UpSetProps<any>> = {};
+  private stateToProps(): Partial<UpSetProps<any> & VennDiagramProps<any>> {
+    const props: Partial<UpSetProps<any> & VennDiagramProps<any>> = {};
     const state = this.model.get_state(true);
 
     const toCamelCase = (v: string) => v.replace(/([-_]\w)/g, (g) => g[1].toUpperCase());
@@ -149,28 +151,29 @@ export class UpSetView extends DOMWidgetView {
 
   private fixProps(delta: any) {
     const props = this.props;
-    if (delta.elems != null) {
-      this.attrs = delta.attrs ?? this.attrs;
-      const keys = Object.keys(this.attrs);
-      this.elems = (delta.elems as any[]).map((name, i) => {
-        const attrs: any = {};
-        keys.forEach((key) => (attrs[key] = this.attrs[key][i]));
-        return { name, attrs };
-      });
-      this.elemToIndex.clear();
-      this.elems.forEach((e, i) => this.elemToIndex.set(e, i));
-      this.syncAddons(keys);
-    } else if (delta.attrs != null) {
-      // only attrs same elems
-      this.attrs = delta.attrs;
-      const keys = Object.keys(this.attrs);
-      this.elems.forEach((elem, i) => {
-        const attrs: any = {};
-        keys.forEach((key) => (attrs[key] = this.attrs[key][i]));
-        elem.attrs = attrs;
-      });
-      this.syncAddons(keys);
-    }
+    if (delta._r)
+      if (delta.elems != null) {
+        this.attrs = delta.attrs ?? this.attrs;
+        const keys = Object.keys(this.attrs);
+        this.elems = (delta.elems as any[]).map((name, i) => {
+          const attrs: any = {};
+          keys.forEach((key) => (attrs[key] = this.attrs[key][i]));
+          return { name, attrs };
+        });
+        this.elemToIndex.clear();
+        this.elems.forEach((e, i) => this.elemToIndex.set(e, i));
+        this.syncAddons(keys);
+      } else if (delta.attrs != null) {
+        // only attrs same elems
+        this.attrs = delta.attrs;
+        const keys = Object.keys(this.attrs);
+        this.elems.forEach((elem, i) => {
+          const attrs: any = {};
+          keys.forEach((key) => (attrs[key] = this.attrs[key][i]));
+          elem.attrs = attrs;
+        });
+        this.syncAddons(keys);
+      }
     delete (this.props as any).elems;
     delete (this.props as any).attrs;
 
@@ -215,6 +218,7 @@ export class UpSetView extends DOMWidgetView {
 
     delete props.onHover;
     delete props.onClick;
+    delete props.onContextMenu;
     if (this.model.get('mode') === 'click') {
       props.onClick = this.changeSelection;
     } else if (this.model.get('mode') === 'hover') {
@@ -231,18 +235,27 @@ export class UpSetView extends DOMWidgetView {
   private renderImpl() {
     const bb = this.el.getBoundingClientRect();
     const p = Object.assign({}, this.props);
+    const renderMode = this.model.get('_render_mode');
 
     if (!bb.width || !bb.height) {
       requestAnimationFrame(() => {
         const bb2 = this.el.getBoundingClientRect();
         p.width = bb2.width || 600;
         p.height = bb2.height || 400;
-        render(this.el, p);
+        if (renderMode === 'venn') {
+          renderVennDiagram(this.el, p);
+        } else {
+          render(this.el, p);
+        }
       });
       return;
     }
     p.width = bb.width;
     p.height = bb.height;
-    render(this.el, p);
+    if (renderMode === 'venn') {
+      renderVennDiagram(this.el, p);
+    } else {
+      render(this.el, p);
+    }
   }
 }

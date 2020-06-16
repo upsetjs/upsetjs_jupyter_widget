@@ -218,6 +218,7 @@ class UpSetFontSizes:
     set_label: t.Union[None, str, int] = None
     bar_label: t.Union[None, str, int] = None
     export_label: t.Union[None, str, int] = None
+    value_label: t.Union[None, str, int] = None
     legend: t.Union[None, str, int] = None
     title: t.Union[None, str, int] = None
     description: t.Union[None, str, int] = None

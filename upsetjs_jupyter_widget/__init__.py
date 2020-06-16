@@ -8,13 +8,14 @@
 UpSet.js Jupyter Widget
 """
 
-from .widget import UpSetJSWidget
+from .widget import UpSetJSWidget, UpSetJSVennDiagramWidget
 from ._model import (
     UpSetBaseSet,
     UpSetQuery,
     UpSetSet,
     UpSetSetCombination,
     UpSetSetComposite,
+    UpSetSetDistinctIntersection,
     UpSetSetIntersection,
     UpSetSetLike,
     UpSetSetType,

@@ -133,9 +133,8 @@ def _to_query_list(arr: t.List[UpSetQuery], model: "UpSetJSWidget"):
     return [_to_query(q) for q in arr]
 
 
-@register
-class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
-    """UpSet.js Widget
+class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
+    """UpSet.js Base Widget
     """
 
     _model_name = Unicode("UpSetModel").tag(sync=True)
@@ -145,32 +144,19 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
     _view_module = Unicode(MODULE_NAME).tag(sync=True)
     _view_module_version = Unicode(MODULE_VERSION).tag(sync=True)
 
-    """
-    interactivity mode of the widget whether the plot is static, reacts on hover or click events
-    """
     mode: str = Enum(
         ("hover", "click", "static", "contextMenu"), default_value="hover"
     ).tag(sync=True)
     """
-    padding within the svg
+    interactivity mode of the widget whether the plot is static, reacts on hover or click events
     """
     padding: float = Float(None, allow_none=True).tag(sync=True)
     """
-    padding argument for scaleBand (0..1)
+    padding within the svg
     """
-    bar_padding: float = Float(None, allow_none=True).tag(sync=True)
-    dot_padding: float = Float(None, allow_none=True).tag(sync=True)
-    width_ratios: t.Tuple[float, float, float] = Tuple(
-        Float(), Float(), Float(), default_value=(0.25, 0.1, 0.65)
-    ).tag(sync=True)
-    height_ratios: t.Tuple[float, float] = Tuple(
-        Float(), Float(), default_value=(0.6, 0.4)
-    ).tag(sync=True)
 
     elems: t.List[T] = List(default_value=[]).tag(sync=True)
     elem_to_index: t.Dict[T, int] = {}
-
-    attrs: t.Dict[str, t.List[float]] = Dict().tag(sync=True)
 
     sets: t.List[UpSetSet[T]] = List(Instance(UpSetSet), default_value=[],).tag(
         sync=True, to_json=_to_set_list
@@ -192,15 +178,9 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
     theme: str = Enum(("light", "dark", "vega"), default_value="light").tag(sync=True)
     selection_color: str = Color(None, allow_none=True).tag(sync=True)
     has_selection_color: str = Color(None, allow_none=True).tag(sync=True)
-    alternating_background_color: str = Color(None, allow_none=True).tag(sync=True)
+
     color: str = Color(None, allow_none=True).tag(sync=True)
     text_color: str = Color(None, allow_none=True).tag(sync=True)
-    hover_hint_color: str = Color(None, allow_none=True).tag(sync=True)
-    not_member_color: str = Color(None, allow_none=True).tag(sync=True)
-
-    bar_label_offset: float = Float(None, allow_none=True).tag(sync=True)
-    set_name_axis_offset: float = Float(None, allow_none=True).tag(sync=True)
-    combination_name_axis_offset: float = Float(None, allow_none=True).tag(sync=True)
 
     query_legend: bool = Bool(None, allow_none=True).tag(sync=True)
     export_buttons: bool = Bool(None, allow_none=True).tag(sync=True)
@@ -208,11 +188,7 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
     font_sizes: UpSetFontSizes = Instance(UpSetFontSizes).tag(
         sync=True, to_json=lambda v, _: v.to_json()
     )
-    numeric_scale: str = Enum(("linear", "log"), default_value="linear").tag(sync=True)
-    band_scale: str = Enum(("band"), default_value="band").tag(sync=True)
 
-    set_name: str = Unicode(None, allow_none=True).tag(sync=True)
-    combination_name: str = Unicode(None, allow_none=True).tag(sync=True)
     title: str = Unicode(None, allow_none=True).tag(sync=True)
     description: str = Unicode(None, allow_none=True).tag(sync=True)
 
@@ -220,20 +196,11 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         super().__init__(**kwargs)
         self.observe(self._sync_value, "value")
 
-    def copy(self) -> "UpSetJSWidget":
-        """
-        returns a copy of itself
-        """
-        clone = UpSetJSWidget[T]()  # pylint: disable=unsubscriptable-object
-
+    def _base_copy(self, clone: "UpSetJSBaseWidget"):
         clone.title = self.title
         clone.description = self.description
         clone.mode = self.mode
         clone.padding = self.padding
-        clone.bar_padding = self.bar_padding
-        clone.dot_padding = self.dot_padding
-        clone.width_ratios = self.width_ratios
-        clone.height_ratios = self.height_ratios
         clone.elems = list(self.elems)
         clone.elem_to_index = self.elem_to_index.copy()
         clone.sets = list(self.sets)
@@ -245,28 +212,14 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
 
         clone.theme = self.theme
         clone.selection_color = self.selection_color
-        clone.alternating_background_color = self.alternating_background_color
         clone.color = self.color
         clone.has_selection_color = self.has_selection_color
         clone.text_color = self.text_color
-        clone.hover_hint_color = self.hover_hint_color
-        clone.not_member_color = self.not_member_color
-
-        clone.bar_label_offset = self.bar_label_offset
-        clone.set_name_axis_offset = self.set_name_axis_offset
-        clone.combination_name_axis_offset = self.combination_name_axis_offset
 
         clone.query_legend = self.query_legend
         clone.export_buttons = self.export_buttons
         clone.font_family = self.font_family
         clone.font_sizes = self.font_sizes.copy()
-        clone.numeric_scale = self.numeric_scale
-        clone.band_scale = self.band_scale
-
-        clone.set_name = self.set_name
-        clone.combination_name = self.combination_name
-
-        return clone
 
     def _sync_value(self, evt: t.Any):
         self._selection = self._value_to_selection(evt["new"])
@@ -426,7 +379,7 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         sets: t.Dict[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
-    ) -> "UpSetJSWidget":
+    ) -> "UpSetJSBaseWidget":
         """
         generates the list of sets from a dict
         """
@@ -442,8 +395,8 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self.clear_queries()
         self.selection = None
         self.sets = _sort_sets(base_sets, order_by, limit)
-        self.attrs = OrderedDict()
-        return self.generate_intersections(order_by=order_by)
+
+        return self
 
     def from_dataframe(
         self,
@@ -451,7 +404,7 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         attributes: t.Union[t.Sequence[str], t.Any, None] = None,
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
-    ):
+    ) -> "UpSetJSBaseWidget":
         """
         generates the list of sets from a dataframe
         """
@@ -472,6 +425,95 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self.clear_queries()
         self.selection = None
         self.sets = _sort_sets(base_sets, order_by, limit)
+        return self
+
+
+@register
+class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
+    """UpSet.js Widget
+    """
+
+    _render_mode = Unicode("upset").tag(sync=True)
+
+    bar_padding: float = Float(None, allow_none=True).tag(sync=True)
+    """
+    padding argument for scaleBand (0..1)
+    """
+    dot_padding: float = Float(None, allow_none=True).tag(sync=True)
+    width_ratios: t.Tuple[float, float, float] = Tuple(
+        Float(), Float(), Float(), default_value=(0.25, 0.1, 0.65)
+    ).tag(sync=True)
+    height_ratios: t.Tuple[float, float] = Tuple(
+        Float(), Float(), default_value=(0.6, 0.4)
+    ).tag(sync=True)
+
+    attrs: t.Dict[str, t.List[float]] = Dict().tag(sync=True)
+
+    alternating_background_color: str = Color(None, allow_none=True).tag(sync=True)
+    hover_hint_color: str = Color(None, allow_none=True).tag(sync=True)
+    not_member_color: str = Color(None, allow_none=True).tag(sync=True)
+
+    bar_label_offset: float = Float(None, allow_none=True).tag(sync=True)
+    set_name_axis_offset: float = Float(None, allow_none=True).tag(sync=True)
+    combination_name_axis_offset: float = Float(None, allow_none=True).tag(sync=True)
+
+    numeric_scale: str = Enum(("linear", "log"), default_value="linear").tag(sync=True)
+    band_scale: str = Enum(("band"), default_value="band").tag(sync=True)
+
+    set_name: str = Unicode(None, allow_none=True).tag(sync=True)
+    combination_name: str = Unicode(None, allow_none=True).tag(sync=True)
+
+    def copy(self) -> "UpSetJSWidget":
+        """
+        returns a copy of itself
+        """
+        clone = UpSetJSWidget[T]()  # pylint: disable=unsubscriptable-object
+        self._base_copy(clone)
+        clone.bar_padding = self.bar_padding
+        clone.dot_padding = self.dot_padding
+        clone.width_ratios = self.width_ratios
+        clone.height_ratios = self.height_ratios
+
+        clone.alternating_background_color = self.alternating_background_color
+        clone.hover_hint_color = self.hover_hint_color
+        clone.not_member_color = self.not_member_color
+
+        clone.bar_label_offset = self.bar_label_offset
+        clone.set_name_axis_offset = self.set_name_axis_offset
+        clone.combination_name_axis_offset = self.combination_name_axis_offset
+
+        clone.numeric_scale = self.numeric_scale
+        clone.band_scale = self.band_scale
+
+        clone.set_name = self.set_name
+        clone.combination_name = self.combination_name
+
+        return clone
+
+    def from_dict(
+        self,
+        sets: t.Dict[str, t.Sequence[T]],
+        order_by: str = "cardinality",
+        limit: t.Optional[int] = None,
+    ) -> "UpSetJSWidget":
+        """
+        generates the list of sets from a dict
+        """
+        super().from_dict(sets, order_by, limit)
+        self.attrs = OrderedDict()
+        return self.generate_intersections(order_by=order_by)
+
+    def from_dataframe(
+        self,
+        data_frame: t.Any,
+        attributes: t.Union[t.Sequence[str], t.Any, None] = None,
+        order_by: str = "cardinality",
+        limit: t.Optional[int] = None,
+    ):
+        """
+        generates the list of sets from a dataframe
+        """
+        super().from_dataframe(data_frame, attributes, order_by, limit)
 
         if attributes is not None:
             attribute_df = (
@@ -543,4 +585,62 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         )
 
         self.combinations = _sort_combinations(set_unions, self.sets, order_by, limit)
+        return self
+
+
+@register
+class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
+    """UpSet.js Venn Diagram Widget
+    """
+
+    _render_mode = Unicode("venn").tag(sync=True)
+
+    value_text_color: str = Color(None, allow_none=True).tag(sync=True)
+    stroke_color: str = Color(None, allow_none=True).tag(sync=True)
+
+    def copy(self) -> "UpSetJSVennDiagramWidget":
+        """
+        returns a copy of itself
+        """
+        clone = UpSetJSVennDiagramWidget[T]()  # pylint: disable=unsubscriptable-object
+        self._base_copy(clone)
+        clone.value_text_color = self.value_text_color
+        clone.stroke_color = self.stroke_color
+
+        return clone
+
+    def from_dict(
+        self,
+        sets: t.Dict[str, t.Sequence[T]],
+        order_by: str = "cardinality",
+        limit: t.Optional[int] = None,
+    ) -> "UpSetJSVennDiagramWidget":
+        """
+        generates the list of sets from a dict
+        """
+        super().from_dict(sets, order_by, limit)
+        return self._generate_distinct_intersections()
+
+    def from_dataframe(
+        self,
+        data_frame: t.Any,
+        attributes: t.Union[t.Sequence[str], t.Any, None] = None,
+        order_by: str = "cardinality",
+        limit: t.Optional[int] = None,
+    ):
+        """
+        generates the list of sets from a dataframe
+        """
+        super().from_dataframe(data_frame, attributes, order_by, limit)
+
+        return self._generate_distinct_intersections()
+
+    def _generate_distinct_intersections(self):
+        set_intersections = generate_distinct_intersections(
+            self.sets, 1, None, True, self.elems
+        )
+
+        self.combinations = _sort_combinations(
+            set_intersections, self.sets, ["degree", "group"]
+        )
         return self

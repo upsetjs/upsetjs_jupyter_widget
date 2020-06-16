@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@jupyter-widgets/base": ">=2 || 4.0.0-alpha.0",
-    "@upsetjs/bundle": "~1.1.0"
+    "@upsetjs/bundle": "~1.2.0"
   },
   "devDependencies": {
     "@jupyterlab/services": "^5.1.0",
