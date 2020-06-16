@@ -35,11 +35,16 @@ from ._model import (
     UpSetSetCombination,
     UpSetSetComposite,
     UpSetSetIntersection,
+    UpSetSetDistinctIntersection,
     UpSetSetLike,
     UpSetSetUnion,
     UpSetFontSizes,
 )
-from ._generate import generate_unions, generate_intersections
+from ._generate import (
+    generate_unions,
+    generate_intersections,
+    generate_distinct_intersections,
+)
 from ._array import compress_index_array
 
 
@@ -140,12 +145,12 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
     _view_module = Unicode(MODULE_NAME).tag(sync=True)
     _view_module_version = Unicode(MODULE_VERSION).tag(sync=True)
 
-    description: str = Unicode("", help="Description of the control.").tag(sync=True)
-
     """
     interactivity mode of the widget whether the plot is static, reacts on hover or click events
     """
-    mode: str = Enum(("hover", "click", "static"), default_value="hover").tag(sync=True)
+    mode: str = Enum(
+        ("hover", "click", "static", "contextMenu"), default_value="hover"
+    ).tag(sync=True)
     """
     padding within the svg
     """
@@ -184,8 +189,9 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         sync=True, to_json=_to_query_list
     )
 
-    theme: str = Enum(("light", "dark"), default_value="light").tag(sync=True)
+    theme: str = Enum(("light", "dark", "vega"), default_value="light").tag(sync=True)
     selection_color: str = Color(None, allow_none=True).tag(sync=True)
+    has_selection_color: str = Color(None, allow_none=True).tag(sync=True)
     alternating_background_color: str = Color(None, allow_none=True).tag(sync=True)
     color: str = Color(None, allow_none=True).tag(sync=True)
     text_color: str = Color(None, allow_none=True).tag(sync=True)
@@ -203,10 +209,12 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         sync=True, to_json=lambda v, _: v.to_json()
     )
     numeric_scale: str = Enum(("linear", "log"), default_value="linear").tag(sync=True)
-    band_scale: str = Enum(("band", "band2"), default_value="band").tag(sync=True)
+    band_scale: str = Enum(("band"), default_value="band").tag(sync=True)
 
     set_name: str = Unicode(None, allow_none=True).tag(sync=True)
     combination_name: str = Unicode(None, allow_none=True).tag(sync=True)
+    title: str = Unicode(None, allow_none=True).tag(sync=True)
+    description: str = Unicode(None, allow_none=True).tag(sync=True)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -218,6 +226,7 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         """
         clone = UpSetJSWidget[T]()  # pylint: disable=unsubscriptable-object
 
+        clone.title = self.title
         clone.description = self.description
         clone.mode = self.mode
         clone.padding = self.padding
@@ -238,6 +247,7 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         clone.selection_color = self.selection_color
         clone.alternating_background_color = self.alternating_background_color
         clone.color = self.color
+        clone.has_selection_color = self.has_selection_color
         clone.text_color = self.text_color
         clone.hover_hint_color = self.hover_hint_color
         clone.not_member_color = self.not_member_color
@@ -301,6 +311,8 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
                 return UpSetSet[T](name, elems)
             if typee == "intersection":
                 return UpSetSetIntersection[T](name, elems, sets)
+            if typee == "distinctIntersection":
+                return UpSetSetDistinctIntersection[T](name, elems, sets)
             if typee == "union":
                 return UpSetSetUnion[T](name, elems, sets)
             return UpSetSetComposite[T](name, elems, sets)
@@ -327,7 +339,13 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
             self.value = dict(type="set", name=value.name)
         else:
             assert isinstance(
-                value, (UpSetSetIntersection, UpSetSetUnion, UpSetSetComposite)
+                value,
+                (
+                    UpSetSetIntersection,
+                    UpSetSetUnion,
+                    UpSetSetComposite,
+                    UpSetSetDistinctIntersection,
+                ),
             )
             self.value = dict(type=str(value.set_type), name=value.name)
         # unknown
@@ -481,6 +499,26 @@ class UpSetJSWidget(ValueWidget, DOMWidget, t.Generic[T]):
         customize the generation of the sets
         """
         set_intersections = generate_intersections(
+            self.sets, min_degree, max_degree, empty, self.elems
+        )
+
+        self.combinations = _sort_combinations(
+            set_intersections, self.sets, order_by, limit
+        )
+        return self
+
+    def generate_distinct_intersections(
+        self,
+        min_degree: int = 0,
+        max_degree: t.Optional[int] = None,
+        empty: bool = False,
+        order_by: t.Union[str, t.Sequence[str]] = "cardinality",
+        limit: t.Optional[int] = None,
+    ):
+        """
+        customize the generation of the sets
+        """
+        set_intersections = generate_distinct_intersections(
             self.sets, min_degree, max_degree, empty, self.elems
         )
 

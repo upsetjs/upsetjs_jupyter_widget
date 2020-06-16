@@ -20,6 +20,7 @@ class UpSetSetType(Enum):
 
     SET = ("set",)
     INTERSECTION = "intersection"
+    DISTINCT_INTERSECTION = "distinctIntersection"
     UNION = "union"
     COMPOSITE = "composite"
 
@@ -28,6 +29,8 @@ class UpSetSetType(Enum):
             return "set"
         if self == UpSetSetType.INTERSECTION:
             return "intersection"
+        if self == UpSetSetType.DISTINCT_INTERSECTION:
+            return "distinctIntersection"
         if self == UpSetSetType.UNION:
             return "union"
         return "composite"
@@ -126,6 +129,20 @@ class UpSetSetIntersection(UpSetSetCombination[T]):
         super().__init__(UpSetSetType.INTERSECTION, name, elems, sets)
 
 
+class UpSetSetDistinctIntersection(UpSetSetCombination[T]):
+    """
+    a distinct set intersection representation in UpSet
+    """
+
+    def __init__(
+        self,
+        name: str = "",
+        elems: t.Optional[t.FrozenSet[T]] = None,
+        sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
+    ):
+        super().__init__(UpSetSetType.DISTINCT_INTERSECTION, name, elems, sets)
+
+
 class UpSetSetUnion(UpSetSetCombination[T]):
     """
     a set union representation in UpSet
@@ -200,7 +217,10 @@ class UpSetFontSizes:
     axis_tick: t.Union[None, str, int] = None
     set_label: t.Union[None, str, int] = None
     bar_label: t.Union[None, str, int] = None
+    export_label: t.Union[None, str, int] = None
     legend: t.Union[None, str, int] = None
+    title: t.Union[None, str, int] = None
+    description: t.Union[None, str, int] = None
 
     def __init__(self, **kwargs):
         super().__init__()

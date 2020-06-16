@@ -9,7 +9,13 @@ generate set intersection helper
 """
 import typing as t
 from itertools import combinations
-from ._model import T, UpSetSet, UpSetSetIntersection, UpSetSetUnion
+from ._model import (
+    T,
+    UpSetSet,
+    UpSetSetIntersection,
+    UpSetSetUnion,
+    UpSetSetDistinctIntersection,
+)
 
 
 def generate_intersections(
@@ -54,6 +60,34 @@ def generate_intersections(
                 )
             )
     return set_intersections
+
+
+def generate_distinct_intersections(
+    sets: t.Sequence[UpSetSet[T]],
+    min_degree: int = 0,
+    max_degree: t.Optional[int] = None,
+    empty: bool = False,
+    elems: t.Optional[t.List[T]] = None,
+) -> t.List[UpSetSetDistinctIntersection[T]]:
+    """
+    generate distinct intersections
+    """
+    set_intersections = generate_intersections(
+        sets, min_degree, max_degree, empty, elems
+    )
+
+    def remove_others(
+        elems: t.FrozenSet[T], contained_sets: t.FrozenSet[UpSetSet[T]]
+    ) -> t.List[T]:
+        others = [s for s in sets if s not in contained_sets]
+        return [e for e in elems if all(e not in o.elems for o in others)]
+
+    return [
+        UpSetSetDistinctIntersection[T](
+            s.name, frozenset(remove_others(s.elems, s.sets)), sets=s.sets
+        )
+        for s in set_intersections
+    ]
 
 
 def generate_unions(

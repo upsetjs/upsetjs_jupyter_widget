@@ -219,6 +219,8 @@ export class UpSetView extends DOMWidgetView {
       props.onClick = this.changeSelection;
     } else if (this.model.get('mode') === 'hover') {
       props.onHover = this.changeSelection;
+    } else if (this.model.get('mode') === 'contextMenu') {
+      props.onContextMenu = this.changeSelection;
     }
   }
 
