@@ -39,6 +39,7 @@ from ._model import (
     UpSetSetLike,
     UpSetSetUnion,
     UpSetFontSizes,
+    UpSetAttribute,
 )
 from ._generate import (
     generate_unions,
@@ -447,7 +448,9 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         Float(), Float(), default_value=(0.6, 0.4)
     ).tag(sync=True)
 
-    attrs: t.Dict[str, t.List[float]] = Dict().tag(sync=True)
+    attrs: t.List[UpSetAttribute[T]] = List(
+        Instance(UpSetAttribute), default_value=[]
+    ).tag(sync=True, to_json=lambda v, _: [vi.to_json() for vi in v])
 
     alternating_background_color: str = Color(None, allow_none=True).tag(sync=True)
     hover_hint_color: str = Color(None, allow_none=True).tag(sync=True)
@@ -500,7 +503,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         generates the list of sets from a dict
         """
         super().from_dict(sets, order_by, limit)
-        self.attrs = OrderedDict()
+        self.attrs = []
         return self.generate_intersections(order_by=order_by)
 
     def from_dataframe(
@@ -515,17 +518,25 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         """
         super().from_dataframe(data_frame, attributes, order_by, limit)
 
+        def as_attr(name: str, values: t.List):
+            tt = "categorical" if not values or isinstance(values[0], str) else "number"
+            domain = (min(values), max(values)) if tt == "number" else None
+            categories = sorted(set(values)) if tt == "categorical" else None
+            return UpSetAttribute[T](
+                tt, name, values, domain=domain, categories=categories
+            )
+
         if attributes is not None:
             attribute_df = (
                 data_frame[attributes]
                 if isinstance(attributes, (list, tuple))
                 else attributes
             )
-            self.attrs = OrderedDict(
-                [(name, series.tolist()) for name, series in attribute_df.items()]
-            )
+            self.attrs = [
+                as_attr(name, series.tolist()) for name, series in attribute_df.items()
+            ]
         else:
-            self.attrs = OrderedDict()
+            self.attrs = []
 
         return self.generate_intersections(order_by=order_by)
 
@@ -585,6 +596,44 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         )
 
         self.combinations = _sort_combinations(set_unions, self.sets, order_by, limit)
+        return self
+
+    def clear_attributes(self):
+        """
+        deletes the list of attributes
+        """
+        self.attrs = []
+
+    def append_numeric_attribute(
+        self,
+        name: str,
+        values: t.List[float],
+        min_value: t.Optional[float] = None,
+        max_value: t.Optional[float] = None,
+    ) -> "UpSetJSWidget":
+        """
+        adds another numerical UpSetAttribute to be visualized
+        """
+        domain = (
+            min_value if min_value is not None else min(values),
+            max_value if max_value is not None else max(values),
+        )
+        self.attrs = self.attrs + [UpSetAttribute[T]("number", name, values, domain)]
+        return self
+
+    def append_categorical_attribute(
+        self,
+        name: str,
+        values: t.List[str],
+        categories: t.Optional[t.List[t.Union[str, t.Dict]]] = None,
+    ) -> "UpSetJSWidget":
+        """
+        adds another categorical UpSetAttribute to be visualized
+        """
+        cats = categories if categories is not None else sorted(set(values))
+        self.attrs = self.attrs + [
+            UpSetAttribute[T]("categorical", name, values, categories=cats)
+        ]
         return self
 
 

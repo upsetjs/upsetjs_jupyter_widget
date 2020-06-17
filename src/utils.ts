@@ -17,7 +17,7 @@ import {
 
 export interface IElem {
   name: string;
-  attrs: { [key: string]: number };
+  attrs: { [key: string]: number | string };
 }
 
 export function fixSets(sets: ISets<any>, elems: IElem[]) {

@@ -20,6 +20,7 @@ import {
   fromIndicesArray,
   VennDiagramProps,
   renderVennDiagram,
+  categoricalAddon,
 } from '@upsetjs/bundle';
 import { fixCombinations, fixSets, resolveSet, IElem } from './utils';
 
@@ -49,6 +50,23 @@ export class UpSetModel extends DOMWidgetModel {
   static readonly view_module_version = MODULE_VERSION;
 }
 
+declare type UpSetNumericAttrSpec = {
+  type: 'number';
+  name: string;
+  domain: [number, number];
+  values: ReadonlyArray<number>;
+  elems?: ReadonlyArray<string>;
+};
+declare type UpSetCategoricalAttrSpec = {
+  type: 'categorical';
+  name: string;
+  categories: ReadonlyArray<string>;
+  values: ReadonlyArray<string>;
+  elems?: ReadonlyArray<string>;
+};
+
+declare type UpSetAttrSpec = UpSetNumericAttrSpec | UpSetCategoricalAttrSpec;
+
 export class UpSetView extends DOMWidgetView {
   private props: UpSetProps<IElem> & VennDiagramProps<IElem> = {
     sets: [],
@@ -57,7 +75,7 @@ export class UpSetView extends DOMWidgetView {
   };
   private elems: IElem[] = [];
   private readonly elemToIndex = new Map<IElem, number>();
-  private attrs: { [key: string]: number[] } = {};
+  private attrs: UpSetAttrSpec[] = [];
 
   render() {
     this.model.on('change', this.changed_prop, this);
@@ -130,49 +148,67 @@ export class UpSetView extends DOMWidgetView {
     this.renderImpl();
   }
 
-  private syncAddons(keys: string[]) {
-    if (keys.length === 0) {
+  private syncAddons() {
+    if (this.attrs.length === 0) {
       delete this.props.setAddons;
       delete this.props.combinationAddons;
       return;
     }
-    this.props.setAddons = keys.map((key) =>
-      boxplotAddon((v) => v.attrs[key], this.elems, {
-        name: key,
-      })
-    );
-    this.props.combinationAddons = keys.map((key) =>
-      boxplotAddon((v) => v.attrs[key], this.elems, {
-        name: key,
-        orient: 'vertical',
-      })
-    );
+    const toAddon = (attr: UpSetAttrSpec, vertical = false) => {
+      if (attr.type === 'number') {
+        return boxplotAddon<IElem>(
+          (v) => v.attrs[attr.name] as number,
+          { min: attr.domain[0], max: attr.domain[1] },
+          {
+            name: attr.name,
+            quantiles: 'hinges',
+            orient: vertical ? 'vertical' : 'horizontal',
+          }
+        );
+      }
+      return categoricalAddon<IElem>(
+        (v) => v.attrs[attr.name] as string,
+        {
+          categories: attr.categories,
+        },
+        {
+          name: attr.name,
+          orient: vertical ? 'vertical' : 'horizontal',
+        }
+      );
+    };
+    this.props.setAddons = this.attrs.map((attr) => toAddon(attr, false));
+    this.props.combinationAddons = this.attrs.map((attr) => toAddon(attr, true));
   }
 
   private fixProps(delta: any) {
     const props = this.props;
-    if (delta._r)
+    if (delta.elems)
       if (delta.elems != null) {
         this.attrs = delta.attrs ?? this.attrs;
-        const keys = Object.keys(this.attrs);
+        const lookups = this.attrs.map((attr) => (attr.elems ? new Map(attr.elems.map((e, i) => [e, i])) : null));
         this.elems = (delta.elems as any[]).map((name, i) => {
           const attrs: any = {};
-          keys.forEach((key) => (attrs[key] = this.attrs[key][i]));
+          this.attrs.forEach(
+            (attr, j) => (attrs[attr.name] = attr.values[lookups[j] ? lookups[j]!.get(name) ?? i : i])
+          );
           return { name, attrs };
         });
         this.elemToIndex.clear();
         this.elems.forEach((e, i) => this.elemToIndex.set(e, i));
-        this.syncAddons(keys);
+        this.syncAddons();
       } else if (delta.attrs != null) {
         // only attrs same elems
         this.attrs = delta.attrs;
-        const keys = Object.keys(this.attrs);
+        const lookups = this.attrs.map((attr) => (attr.elems ? new Map(attr.elems.map((e, i) => [e, i])) : null));
         this.elems.forEach((elem, i) => {
           const attrs: any = {};
-          keys.forEach((key) => (attrs[key] = this.attrs[key][i]));
+          this.attrs.forEach(
+            (attr, j) => (attrs[attr.name] = attr.values[lookups[j] ? lookups[j]!.get(elem.name) ?? i : i])
+          );
           elem.attrs = attrs;
         });
-        this.syncAddons(keys);
+        this.syncAddons();
       }
     delete (this.props as any).elems;
     delete (this.props as any).attrs;

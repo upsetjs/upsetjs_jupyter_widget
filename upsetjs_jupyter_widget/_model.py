@@ -241,3 +241,46 @@ class UpSetFontSizes:
         converts this instance to a regular dictionary for transfering
         """
         return self.__dict__
+
+
+class UpSetAttribute(t.Generic[T]):
+    """
+    helper structure for specifying font sizes
+    """
+
+    type: str
+    name: str
+    domain: t.Optional[t.Tuple[float, float]]
+    categories: t.Optional[t.List[t.Union[str, t.Dict]]]
+    elems: t.Optional[t.List[T]]
+    values: t.Union[t.List[str], t.List[float]]
+
+    def __init__(
+        self,
+        type: str,
+        name: str,
+        values: t.Union[t.List[str], t.List[float]],
+        domain: t.Optional[t.Tuple[float, float]] = None,
+        categories: t.Optional[t.List[t.Union[str, t.Dict]]] = None,
+        elems: t.Optional[t.List[T]] = None,
+    ):
+        super().__init__()
+        self.type = type
+        self.name = name
+        self.values = values
+        self.domain = domain
+        self.categories = categories
+        self.elems = elems
+
+    def to_json(self):
+        """
+        converts this instance to a regular dictionary for transfering
+        """
+        base = dict(
+            type=self.type, values=self.values, name=self.name, elems=self.elems
+        )
+        if self.type == "number":
+            base["domain"] = self.domain
+        else:
+            base["categories"] = self.categories
+        return base
