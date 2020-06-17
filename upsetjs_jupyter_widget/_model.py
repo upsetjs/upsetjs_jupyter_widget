@@ -248,7 +248,7 @@ class UpSetAttribute(t.Generic[T]):
     helper structure for specifying font sizes
     """
 
-    type: str
+    attr_type: str
     name: str
     domain: t.Optional[t.Tuple[float, float]]
     categories: t.Optional[t.List[t.Union[str, t.Dict]]]
@@ -257,7 +257,7 @@ class UpSetAttribute(t.Generic[T]):
 
     def __init__(
         self,
-        type: str,
+        attr_type: str,
         name: str,
         values: t.Union[t.List[str], t.List[float]],
         domain: t.Optional[t.Tuple[float, float]] = None,
@@ -265,7 +265,7 @@ class UpSetAttribute(t.Generic[T]):
         elems: t.Optional[t.List[T]] = None,
     ):
         super().__init__()
-        self.type = type
+        self.attr_type = attr_type
         self.name = name
         self.values = values
         self.domain = domain
@@ -277,9 +277,9 @@ class UpSetAttribute(t.Generic[T]):
         converts this instance to a regular dictionary for transfering
         """
         base = dict(
-            type=self.type, values=self.values, name=self.name, elems=self.elems
+            type=self.attr_type, values=self.values, name=self.name, elems=self.elems
         )
-        if self.type == "number":
+        if self.attr_type == "number":
             base["domain"] = self.domain
         else:
             base["categories"] = self.categories

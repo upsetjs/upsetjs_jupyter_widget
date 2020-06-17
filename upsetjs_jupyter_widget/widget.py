@@ -9,7 +9,6 @@ UpSet.js Jupyter Widget
 """
 
 import typing as t
-from collections import OrderedDict
 
 from ipywidgets import DOMWidget, Layout, ValueWidget, register
 from ipywidgets.widgets.trait_types import Color
@@ -519,11 +518,13 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         super().from_dataframe(data_frame, attributes, order_by, limit)
 
         def as_attr(name: str, values: t.List):
-            tt = "categorical" if not values or isinstance(values[0], str) else "number"
-            domain = (min(values), max(values)) if tt == "number" else None
-            categories = sorted(set(values)) if tt == "categorical" else None
+            attr_type = (
+                "categorical" if not values or isinstance(values[0], str) else "number"
+            )
+            domain = (min(values), max(values)) if attr_type == "number" else None
+            categories = sorted(set(values)) if attr_type == "categorical" else None
             return UpSetAttribute[T](
-                tt, name, values, domain=domain, categories=categories
+                attr_type, name, values, domain=domain, categories=categories
             )
 
         if attributes is not None:
