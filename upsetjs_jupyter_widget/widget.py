@@ -748,4 +748,3 @@ class UpSetJSEulerDiagramWidget(UpSetJSVennDiagramWidget, t.Generic[T]):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._render_mode = "euler"
-
