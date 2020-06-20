@@ -29,7 +29,7 @@ def generate_intersections(
     """
     generate intersections
     """
-    cc = colors or {}
+    color_lookup = colors or {}
 
     def compute_intersection(combo: t.List[UpSetSet[T]]):
         if len(combo) == 0:
@@ -62,7 +62,9 @@ def generate_intersections(
                     name,
                     frozenset(intersection),
                     sets=frozenset(set_list),
-                    color=cc.get(name, cc.get("&".join(s.name for s in set_list))),
+                    color=color_lookup.get(
+                        name, color_lookup.get("&".join(s.name for s in set_list))
+                    ),
                 )
             )
     return set_intersections
@@ -111,7 +113,7 @@ def generate_unions(
     """
     generate unions
     """
-    cc = colors or {}
+    color_lookup = colors or {}
 
     def compute_union(combo: t.List[UpSetSet[T]]):
         if len(combo) == 0:
@@ -141,7 +143,9 @@ def generate_unions(
                     name,
                     frozenset(union),
                     sets=frozenset(set_list),
-                    color=cc.get(name, cc.get("&".join(s.name for s in set_list))),
+                    color=color_lookup.get(
+                        name, color_lookup.get("&".join(s.name for s in set_list))
+                    ),
                 )
             )
     return set_unions

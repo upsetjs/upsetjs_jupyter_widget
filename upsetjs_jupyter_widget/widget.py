@@ -397,10 +397,10 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
             elems.update(set_elems)
         self.elems = sorted(elems)
         self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
-        cc = colors or {}
+        color_lookup = colors or {}
 
         base_sets: t.List[UpSetSet[T]] = [
-            UpSetSet[T](name=k, elems=frozenset(v), color=cc.get(k))
+            UpSetSet[T](name=k, elems=frozenset(v), color=color_lookup.get(k))
             for k, v in sets.items()
         ]
         self.clear_queries()
@@ -422,11 +422,13 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
         """
         self.elems = sorted(data_frame.index)
         self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
-        cc = colors or {}
+        color_lookup = colors or {}
 
         def to_set(name: str, series):
             elems = series[series.astype(bool)].index
-            return UpSetSet[T](name=name, elems=frozenset(elems), color=cc.get(name))
+            return UpSetSet[T](
+                name=name, elems=frozenset(elems), color=color_lookup.get(name)
+            )
 
         attribute_columns = attributes if isinstance(attributes, (list, tuple)) else []
 
