@@ -24,10 +24,12 @@ def generate_intersections(
     max_degree: t.Optional[int] = None,
     empty: bool = False,
     elems: t.Optional[t.List[T]] = None,
+    colors: t.Mapping[str, str] = None,
 ) -> t.List[UpSetSetIntersection[T]]:
     """
     generate intersections
     """
+    cc = colors or {}
 
     def compute_intersection(combo: t.List[UpSetSet[T]]):
         if len(combo) == 0:
@@ -42,7 +44,8 @@ def generate_intersections(
         return first
 
     set_intersections: t.List[UpSetSetIntersection[T]] = []
-    for i in range(min_degree, len(sets) if max_degree is None else (max_degree + 1)):
+    max_degree = max_degree or len(sets)
+    for i in range(min_degree, max_degree + 1):
         for combo in combinations(sets, i):
             set_list = list(combo)
             degree = len(set_list)
@@ -56,7 +59,10 @@ def generate_intersections(
             )
             set_intersections.append(
                 UpSetSetIntersection[T](
-                    name, frozenset(intersection), sets=frozenset(set_list)
+                    name,
+                    frozenset(intersection),
+                    sets=frozenset(set_list),
+                    color=cc.get(name, cc.get("&".join(s.name for s in set_list))),
                 )
             )
     return set_intersections
@@ -68,12 +74,13 @@ def generate_distinct_intersections(
     max_degree: t.Optional[int] = None,
     empty: bool = False,
     elems: t.Optional[t.List[T]] = None,
+    colors: t.Mapping[str, str] = None,
 ) -> t.List[UpSetSetDistinctIntersection[T]]:
     """
     generate distinct intersections
     """
     set_intersections = generate_intersections(
-        sets, min_degree, max_degree, empty, elems
+        sets, min_degree, max_degree, empty, elems, colors=colors
     )
 
     def remove_others(
@@ -84,7 +91,10 @@ def generate_distinct_intersections(
 
     return [
         UpSetSetDistinctIntersection[T](
-            s.name, frozenset(remove_others(s.elems, s.sets)), sets=s.sets
+            s.name,
+            frozenset(remove_others(s.elems, s.sets)),
+            sets=s.sets,
+            color=s.color,
         )
         for s in set_intersections
     ]
@@ -96,10 +106,12 @@ def generate_unions(
     max_degree: t.Optional[int] = None,
     empty: bool = False,
     elems: t.Optional[t.List[T]] = None,
+    colors: t.Mapping[str, str] = None,
 ) -> t.List[UpSetSetUnion[T]]:
     """
     generate unions
     """
+    cc = colors or {}
 
     def compute_union(combo: t.List[UpSetSet[T]]):
         if len(combo) == 0:
@@ -125,6 +137,11 @@ def generate_unions(
                 else f"({' ∪ '.join(c.name for c in set_list)})"
             )
             set_unions.append(
-                UpSetSetUnion[T](name, frozenset(union), sets=frozenset(set_list))
+                UpSetSetUnion[T](
+                    name,
+                    frozenset(union),
+                    sets=frozenset(set_list),
+                    color=cc.get(name, cc.get("&".join(s.name for s in set_list))),
+                )
             )
     return set_unions

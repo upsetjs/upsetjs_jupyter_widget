@@ -21,8 +21,12 @@ import {
   VennDiagramProps,
   renderVennDiagram,
   categoricalAddon,
+  createVennJSAdapter,
 } from '@upsetjs/bundle';
+import { layout } from '@upsetjs/venn.js';
 import { fixCombinations, fixSets, resolveSet, IElem } from './utils';
+
+const adapter = createVennJSAdapter(layout);
 
 export class UpSetModel extends DOMWidgetModel {
   defaults() {
@@ -279,6 +283,10 @@ export class UpSetView extends DOMWidgetView {
         p.width = bb2.width || 600;
         p.height = bb2.height || 400;
         if (renderMode === 'venn') {
+          delete p.layout;
+          renderVennDiagram(this.el, p);
+        } else if (renderMode === 'euler') {
+          p.layout = adapter;
           renderVennDiagram(this.el, p);
         } else {
           render(this.el, p);
@@ -289,6 +297,10 @@ export class UpSetView extends DOMWidgetView {
     p.width = bb.width;
     p.height = bb.height;
     if (renderMode === 'venn') {
+      delete p.layout;
+      renderVennDiagram(this.el, p);
+    } else if (renderMode === 'euler') {
+      p.layout = adapter;
       renderVennDiagram(this.el, p);
     } else {
       render(this.el, p);

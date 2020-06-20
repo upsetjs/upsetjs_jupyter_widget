@@ -8,7 +8,7 @@
 UpSet.js Jupyter Widget
 """
 
-from .widget import UpSetJSWidget, UpSetJSVennDiagramWidget
+from .widget import UpSetJSWidget, UpSetJSVennDiagramWidget, UpSetJSEulerDiagramWidget
 from ._model import (
     UpSetBaseSet,
     UpSetQuery,

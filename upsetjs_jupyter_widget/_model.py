@@ -43,6 +43,7 @@ class UpSetBaseSet(t.Generic[T]):
 
     set_type: UpSetSetType
     name: str
+    color: t.Optional[str]
     elems: t.FrozenSet[T]
 
     def __init__(
@@ -50,10 +51,12 @@ class UpSetBaseSet(t.Generic[T]):
         set_type: UpSetSetType,
         name: str,
         elems: t.Optional[t.FrozenSet[T]] = None,
+        color: t.Optional[str] = None,
     ):
         super().__init__()
         self.set_type = set_type
         self.name = name
+        self.color = color
         self.elems = elems or frozenset()
 
     @property
@@ -69,8 +72,13 @@ class UpSetSet(UpSetBaseSet[T]):
     a set representation within UpSet
     """
 
-    def __init__(self, name: str = "", elems: t.Optional[t.FrozenSet[T]] = None):
-        super().__init__(UpSetSetType.SET, name, elems)
+    def __init__(
+        self,
+        name: str = "",
+        elems: t.Optional[t.FrozenSet[T]] = None,
+        color: t.Optional[str] = None,
+    ):
+        super().__init__(UpSetSetType.SET, name, elems, color)
 
     @property
     def degree(self):
@@ -99,8 +107,9 @@ class UpSetSetCombination(UpSetBaseSet[T]):
         name: str = "",
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
+        color: t.Optional[str] = None,
     ):
-        super().__init__(set_type, name, elems)
+        super().__init__(set_type, name, elems, color)
         self.sets = sets or frozenset()
 
     @property
@@ -125,8 +134,9 @@ class UpSetSetIntersection(UpSetSetCombination[T]):
         name: str = "",
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
+        color: t.Optional[str] = None,
     ):
-        super().__init__(UpSetSetType.INTERSECTION, name, elems, sets)
+        super().__init__(UpSetSetType.INTERSECTION, name, elems, sets, color)
 
 
 class UpSetSetDistinctIntersection(UpSetSetCombination[T]):
@@ -139,8 +149,9 @@ class UpSetSetDistinctIntersection(UpSetSetCombination[T]):
         name: str = "",
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
+        color: t.Optional[str] = None,
     ):
-        super().__init__(UpSetSetType.DISTINCT_INTERSECTION, name, elems, sets)
+        super().__init__(UpSetSetType.DISTINCT_INTERSECTION, name, elems, sets, color)
 
 
 class UpSetSetUnion(UpSetSetCombination[T]):
@@ -153,8 +164,9 @@ class UpSetSetUnion(UpSetSetCombination[T]):
         name: str = "",
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
+        color: t.Optional[str] = None,
     ):
-        super().__init__(UpSetSetType.UNION, name, elems, sets)
+        super().__init__(UpSetSetType.UNION, name, elems, sets, color)
 
 
 class UpSetSetComposite(UpSetSetCombination[T]):
@@ -167,8 +179,9 @@ class UpSetSetComposite(UpSetSetCombination[T]):
         name: str = "",
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
+        color: t.Optional[str] = None,
     ):
-        super().__init__(UpSetSetType.COMPOSITE, name, elems, sets)
+        super().__init__(UpSetSetType.COMPOSITE, name, elems, sets, color)
 
 
 UpSetSetLike = t.Union[

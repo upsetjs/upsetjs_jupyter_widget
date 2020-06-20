@@ -98,6 +98,7 @@ def _to_set_list(arr: t.List[UpSetSet], model: "UpSetJSWidget"):
         dict(
             type=str(s.set_type),
             name=s.name,
+            color=s.color,
             cardinality=s.cardinality,
             elems=compress_index_array(model.elem_to_index[e] for e in s.elems),
         )
@@ -110,6 +111,7 @@ def _to_combination_list(arr: t.List[UpSetSetCombination], model: "UpSetJSWidget
         dict(
             type=str(s.set_type),
             name=s.name,
+            color=s.color,
             cardinality=s.cardinality,
             degree=s.degree,
             set_names=[c.name for c in s.sets],
@@ -176,8 +178,12 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
     )
 
     theme: str = Enum(("light", "dark", "vega"), default_value="light").tag(sync=True)
-    selection_color: str = Color(None, allow_none=True).tag(sync=True)
+    selection_color: str = Union(
+        (Color(None, allow_none=True), Unicode(None, allow_none=True))
+    ).tag(sync=True)
     has_selection_color: str = Color(None, allow_none=True).tag(sync=True)
+    opacity: float = Float(None, allow_none=True).tag(sync=True)
+    has_selection_opacity: float = Float(None, allow_none=True).tag(sync=True)
 
     color: str = Color(None, allow_none=True).tag(sync=True)
     text_color: str = Color(None, allow_none=True).tag(sync=True)
@@ -214,6 +220,8 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
         clone.selection_color = self.selection_color
         clone.color = self.color
         clone.has_selection_color = self.has_selection_color
+        clone.opacity = self.opacity
+        clone.has_selection_opacity = self.has_selection_opacity
         clone.text_color = self.text_color
 
         clone.query_legend = self.query_legend
@@ -237,10 +245,10 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
         if isinstance(value, list):
             return frozenset([self.elems[i] for i in value])
         if isinstance(value, dict):
-            typee = value.get("type", "set")
+            set_type = value.get("type", "set")
             name = value["name"]
 
-            if typee == "set":
+            if set_type == "set":
                 found_set = next((s for s in self.sets if s.name == name), None)
                 if found_set:
                     return found_set
@@ -249,7 +257,7 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
                     (
                         s
                         for s in self.combinations
-                        if s.name == name and str(s.set_type) == typee
+                        if s.name == name and str(s.set_type) == set_type
                     ),
                     None,
                 )
@@ -260,13 +268,13 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
             elems = frozenset(self.elems[i] for i in value.get("elems", []))
             set_by_name = {s.name: s for s in self.sets}
             sets = frozenset(set_by_name[n] for n in value.get("set_names", []))
-            if typee == "set":
+            if set_type == "set":
                 return UpSetSet[T](name, elems)
-            if typee == "intersection":
+            if set_type == "intersection":
                 return UpSetSetIntersection[T](name, elems, sets)
-            if typee == "distinctIntersection":
+            if set_type == "distinctIntersection":
                 return UpSetSetDistinctIntersection[T](name, elems, sets)
-            if typee == "union":
+            if set_type == "union":
                 return UpSetSetUnion[T](name, elems, sets)
             return UpSetSetComposite[T](name, elems, sets)
         return None
@@ -374,12 +382,13 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
     def _default_font_sizes(self):  # pylint: disable=no-self-use
         return UpSetFontSizes()
 
-    def from_dict(
+    def _from_dict(
         self,
         sets: t.Dict[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
-    ) -> "UpSetJSBaseWidget":
+        colors: t.Mapping[str, str] = None,
+    ) -> t.List[UpSetSet[T]]:
         """
         generates the list of sets from a dict
         """
@@ -388,36 +397,40 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
             elems.update(set_elems)
         self.elems = sorted(elems)
         self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
+        cc = colors or {}
 
         base_sets: t.List[UpSetSet[T]] = [
-            UpSetSet[T](name=k, elems=frozenset(v)) for k, v in sets.items()
+            UpSetSet[T](name=k, elems=frozenset(v), color=cc.get(k))
+            for k, v in sets.items()
         ]
         self.clear_queries()
         self.selection = None
         self.sets = _sort_sets(base_sets, order_by, limit)
 
-        return self
+        return base_sets if limit is None else self.sets
 
-    def from_dataframe(
+    def _from_dataframe(
         self,
         data_frame: t.Any,
         attributes: t.Union[t.Sequence[str], t.Any, None] = None,
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
-    ) -> "UpSetJSBaseWidget":
+        colors: t.Mapping[str, str] = None,
+    ) -> t.List[UpSetSet[T]]:
         """
         generates the list of sets from a dataframe
         """
         self.elems = sorted(data_frame.index)
         self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
+        cc = colors or {}
 
         def to_set(name: str, series):
             elems = series[series.astype(bool)].index
-            return UpSetSet[T](name=name, elems=frozenset(elems))
+            return UpSetSet[T](name=name, elems=frozenset(elems), color=cc.get(name))
 
         attribute_columns = attributes if isinstance(attributes, (list, tuple)) else []
 
-        base_sets = [
+        base_sets: t.List[UpSetSet[T]] = [
             to_set(name, series)
             for name, series in data_frame.items()
             if name not in attribute_columns
@@ -425,7 +438,7 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self.clear_queries()
         self.selection = None
         self.sets = _sort_sets(base_sets, order_by, limit)
-        return self
+        return base_sets if limit is None else self.sets
 
 
 @register
@@ -497,13 +510,14 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         sets: t.Dict[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
     ) -> "UpSetJSWidget":
         """
         generates the list of sets from a dict
         """
-        super().from_dict(sets, order_by, limit)
+        base_sets = super()._from_dict(sets, order_by, limit, colors)
         self.attrs = []
-        return self.generate_intersections(order_by=order_by)
+        return self._generate_intersections(base_sets, order_by, colors)
 
     def from_dataframe(
         self,
@@ -511,11 +525,14 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         attributes: t.Union[t.Sequence[str], t.Any, None] = None,
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
     ):
         """
         generates the list of sets from a dataframe
         """
-        super().from_dataframe(data_frame, attributes, order_by, limit)
+        base_sets = super()._from_dataframe(
+            data_frame, attributes, order_by, limit, colors
+        )
 
         def as_attr(name: str, values: t.List):
             attr_type = (
@@ -539,7 +556,25 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         else:
             self.attrs = []
 
-        return self.generate_intersections(order_by=order_by)
+        return self._generate_intersections(base_sets, order_by, colors)
+
+    def _generate_intersections(
+        self,
+        base_sets: t.List[UpSetSet[T]],
+        order_by: t.Union[str, t.Sequence[str]] = "cardinality",
+        colors: t.Mapping[str, str] = None,
+    ):
+        """
+        customize the generation of the sets
+        """
+        set_intersections = generate_intersections(
+            base_sets, 0, None, False, self.elems, colors=colors
+        )
+
+        self.combinations = _sort_combinations(
+            set_intersections, self.sets, order_by, None
+        )
+        return self
 
     def generate_intersections(
         self,
@@ -548,12 +583,13 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         empty: bool = False,
         order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
     ):
         """
         customize the generation of the sets
         """
         set_intersections = generate_intersections(
-            self.sets, min_degree, max_degree, empty, self.elems
+            self.sets, min_degree, max_degree, empty, self.elems, colors=colors
         )
 
         self.combinations = _sort_combinations(
@@ -568,12 +604,13 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         empty: bool = False,
         order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
     ):
         """
         customize the generation of the sets
         """
         set_intersections = generate_distinct_intersections(
-            self.sets, min_degree, max_degree, empty, self.elems
+            self.sets, min_degree, max_degree, empty, self.elems, colors=colors,
         )
 
         self.combinations = _sort_combinations(
@@ -588,12 +625,13 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         empty: bool = False,
         order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
     ):
         """
         customize the generation of the sets
         """
         set_unions = generate_unions(
-            self.sets, min_degree, max_degree, empty, self.elems
+            self.sets, min_degree, max_degree, empty, self.elems, colors=colors,
         )
 
         self.combinations = _sort_combinations(set_unions, self.sets, order_by, limit)
@@ -664,12 +702,13 @@ class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
         sets: t.Dict[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
     ) -> "UpSetJSVennDiagramWidget":
         """
         generates the list of sets from a dict
         """
-        super().from_dict(sets, order_by, limit)
-        return self._generate_distinct_intersections()
+        base_sets = super()._from_dict(sets, order_by, limit, colors)
+        return self._generate_distinct_intersections(base_sets, colors=colors)
 
     def from_dataframe(
         self,
@@ -677,20 +716,36 @@ class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
         attributes: t.Union[t.Sequence[str], t.Any, None] = None,
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
     ):
         """
         generates the list of sets from a dataframe
         """
-        super().from_dataframe(data_frame, attributes, order_by, limit)
+        base_sets = super()._from_dataframe(
+            data_frame, attributes, order_by, limit, colors
+        )
 
-        return self._generate_distinct_intersections()
+        return self._generate_distinct_intersections(base_sets, colors=colors)
 
-    def _generate_distinct_intersections(self):
+    def _generate_distinct_intersections(
+        self, base_sets: t.List[UpSetSet[T]], colors: t.Mapping[str, str] = None,
+    ):
         set_intersections = generate_distinct_intersections(
-            self.sets, 1, None, True, self.elems
+            base_sets, 1, None, True, self.elems, colors=colors
         )
 
         self.combinations = _sort_combinations(
             set_intersections, self.sets, ["degree", "group"]
         )
         return self
+
+
+@register
+class UpSetJSEulerDiagramWidget(UpSetJSVennDiagramWidget, t.Generic[T]):
+    """UpSet.js Euler Diagram Widget
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._render_mode = "euler"
+
