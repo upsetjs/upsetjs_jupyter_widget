@@ -72,7 +72,26 @@ interact(selection_changed, s=w)
 
 see also [introduction.ipynb](./master/examples/introduction.ipynb)
 
-see also ![Open in NBViewer][nbviewer]][nbviewer-url] ![Open in Binder][binder]][binder-url]
+see also [![Open in NBViewer][nbviewer]][nbviewer-url] [![Open in Binder][binder]][binder-j-url]
+
+## Documentation
+
+the package documentation is located at [![Open API Docs][docs]][docs-j-url]. An introduction Jupyter Notebooks is at [![Open Example][example]][example-j-url].
+
+## Venn Diagram
+
+Besides the main UpSet.js plot also Venn Diagrams for two or three sets are supported. It uses the same input formats and has similar functionality in terms of interaction.
+
+```python
+from upsetjs_jupyter_widget import UpSetJSVennDiagramWidget
+v = UpSetJSVennDiagramWidget[str]()
+v.from_dict(dict(one = ['a', 'b', 'c', 'e', 'g', 'h', 'k', 'l', 'm'], two = ['a', 'b', 'd', 'e', 'j'], three = ['a', 'e', 'f', 'g', 'h', 'i', 'j', 'l', 'm']))
+v
+```
+
+![image](https://user-images.githubusercontent.com/4129778/84817608-8a574b80-b015-11ea-91b8-2ff17bb533e4.png)
+
+see also [venn.ipynb](https://upset.js.org/integrations/jupyter/venn.html)
 
 ## Dev Environment
 
@@ -80,7 +99,7 @@ see also ![Open in NBViewer][nbviewer]][nbviewer-url] ![Open in Binder][binder]]
 npm i -g yarn
 yarn set version berry
 yarn
-yarn pnpify --sdk
+yarn pnpify --sdk vscode
 pipenv
 ```
 
@@ -93,37 +112,12 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0
 pipenv run jupyter labextension install .
 ```
 
-## Commands
-
-### Testing
+### Commands
 
 ```sh
 yarn test
-```
-
-### Linting
-
-```sh
 yarn lint
-```
-
-### Building
-
-```sh
-yarn install
-yarn build
-```
-
-### Release
-
-based on release-it
-
-**within the pipenv**
-
-```sh
-yarn release:major
-yarn release:minor
-yarn release:patch
+yarn build  !! within the pipenv
 ```
 
 ## Privacy Policy
