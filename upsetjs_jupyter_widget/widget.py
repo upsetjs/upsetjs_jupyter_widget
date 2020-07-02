@@ -528,7 +528,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,
-    ):
+    ) -> "UpSetJSWidget":
         """
         generates the list of sets from a dataframe
         """
@@ -565,7 +565,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         base_sets: t.List[UpSetSet[T]],
         order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         colors: t.Mapping[str, str] = None,
-    ):
+    ) -> "UpSetJSWidget":
         """
         customize the generation of the sets
         """
@@ -586,7 +586,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,
-    ):
+    ) -> "UpSetJSWidget":
         """
         customize the generation of the sets
         """
@@ -607,7 +607,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,
-    ):
+    ) -> "UpSetJSWidget":
         """
         customize the generation of the sets
         """
@@ -628,7 +628,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         order_by: t.Union[str, t.Sequence[str]] = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,
-    ):
+    ) -> "UpSetJSWidget":
         """
         customize the generation of the sets
         """
@@ -639,11 +639,12 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         self.combinations = _sort_combinations(set_unions, self.sets, order_by, limit)
         return self
 
-    def clear_attributes(self):
+    def clear_attributes(self) -> "UpSetJSWidget":
         """
         deletes the list of attributes
         """
         self.attrs = []
+        return self
 
     def append_numeric_attribute(
         self,
@@ -719,7 +720,7 @@ class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,
-    ):
+    ) -> "UpSetJSVennDiagramWidget":
         """
         generates the list of sets from a dataframe
         """
@@ -731,7 +732,7 @@ class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
 
     def _generate_distinct_intersections(
         self, base_sets: t.List[UpSetSet[T]], colors: t.Mapping[str, str] = None,
-    ):
+    ) -> "UpSetJSVennDiagramWidget":
         set_intersections = generate_distinct_intersections(
             base_sets, 1, None, True, self.elems, colors=colors
         )
@@ -750,3 +751,83 @@ class UpSetJSEulerDiagramWidget(UpSetJSVennDiagramWidget, t.Generic[T]):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._render_mode = "euler"
+
+    def copy(self) -> "UpSetJSEulerDiagramWidget":
+        """
+        returns a copy of itself
+        """
+        clone = UpSetJSEulerDiagramWidget[T]()  # pylint: disable=unsubscriptable-object
+        self._base_copy(clone)
+        clone.value_text_color = self.value_text_color
+        clone.stroke_color = self.stroke_color
+
+        return clone
+
+
+@register
+class UpSetJSKarnaughMapWidget(UpSetJSBaseWidget, t.Generic[T]):
+    """UpSet.js Karnaugh Map Widget
+    """
+
+    _render_mode = Unicode("kmap").tag(sync=True)
+
+    bar_padding: float = Float(None, allow_none=True).tag(sync=True)
+    """
+    padding argument for scaleBand (0..1)
+    """
+    stroke_color: str = Color(None, allow_none=True).tag(sync=True)
+    numeric_scale: str = Enum(("linear", "log"), default_value="linear").tag(sync=True)
+
+    def copy(self) -> "UpSetJSKarnaughMapWidget":
+        """
+        returns a copy of itself
+        """
+        clone = UpSetJSKarnaughMapWidget[T]()  # pylint: disable=unsubscriptable-object
+        self._base_copy(clone)
+        clone.bar_padding = self.bar_padding
+        clone.stroke_color = self.stroke_color
+        clone.numeric_scale = self.numeric_scale
+
+        return clone
+
+    def from_dict(
+        self,
+        sets: t.Dict[str, t.Sequence[T]],
+        order_by: str = "cardinality",
+        limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
+    ) -> "UpSetJSKarnaughMapWidget":
+        """
+        generates the list of sets from a dict
+        """
+        base_sets = super()._from_dict(sets, order_by, limit, colors)
+        return self._generate_distinct_intersections(base_sets, colors=colors)
+
+    def from_dataframe(
+        self,
+        data_frame: t.Any,
+        attributes: t.Union[t.Sequence[str], t.Any, None] = None,
+        order_by: str = "cardinality",
+        limit: t.Optional[int] = None,
+        colors: t.Mapping[str, str] = None,
+    ) -> "UpSetJSKarnaughMapWidget":
+        """
+        generates the list of sets from a dataframe
+        """
+        base_sets = super()._from_dataframe(
+            data_frame, attributes, order_by, limit, colors
+        )
+
+        return self._generate_distinct_intersections(base_sets, colors=colors)
+
+    def _generate_distinct_intersections(
+        self, base_sets: t.List[UpSetSet[T]], colors: t.Mapping[str, str] = None,
+    ) -> "UpSetJSKarnaughMapWidget":
+        set_intersections = generate_distinct_intersections(
+            base_sets, 1, None, True, self.elems, colors=colors
+        )
+
+        self.combinations = _sort_combinations(
+            set_intersections, self.sets, ["degree", "group"]
+        )
+        return self

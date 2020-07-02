@@ -20,6 +20,8 @@ import {
   fromIndicesArray,
   VennDiagramProps,
   renderVennDiagram,
+  renderKarnaughMap,
+  KarnaughMapProps,
   categoricalAddon,
   createVennJSAdapter,
 } from '@upsetjs/bundle';
@@ -110,8 +112,8 @@ export class UpSetView extends DOMWidgetView {
     this.model.on('change', this.changed_prop, this);
   };
 
-  private stateToProps(): Partial<UpSetProps<any> & VennDiagramProps<any>> {
-    const props: Partial<UpSetProps<any> & VennDiagramProps<any>> = {};
+  private stateToProps(): Partial<UpSetProps<any> & VennDiagramProps<any> & KarnaughMapProps<any>> {
+    const props: Partial<UpSetProps<any> & VennDiagramProps<any> & KarnaughMapProps<any>> = {};
     const state = this.model.get_state(true);
 
     const toCamelCase = (v: string) => v.replace(/([-_]\w)/g, (g) => g[1].toUpperCase());
@@ -277,33 +279,31 @@ export class UpSetView extends DOMWidgetView {
     const p = Object.assign({}, this.props);
     const renderMode = this.model.get('_render_mode');
 
+    const renderComponent = () => {
+      if (renderMode === 'venn') {
+        delete p.layout;
+        renderVennDiagram(this.el, p);
+      } else if (renderMode === 'euler') {
+        p.layout = adapter;
+        renderVennDiagram(this.el, p);
+      } else if (renderMode === 'kmap') {
+        renderKarnaughMap(this.el, p);
+      } else {
+        render(this.el, p);
+      }
+    };
+
     if (!bb.width || !bb.height) {
       requestAnimationFrame(() => {
         const bb2 = this.el.getBoundingClientRect();
         p.width = bb2.width || 600;
         p.height = bb2.height || 400;
-        if (renderMode === 'venn') {
-          delete p.layout;
-          renderVennDiagram(this.el, p);
-        } else if (renderMode === 'euler') {
-          p.layout = adapter;
-          renderVennDiagram(this.el, p);
-        } else {
-          render(this.el, p);
-        }
+        renderComponent();
       });
       return;
     }
     p.width = bb.width;
     p.height = bb.height;
-    if (renderMode === 'venn') {
-      delete p.layout;
-      renderVennDiagram(this.el, p);
-    } else if (renderMode === 'euler') {
-      p.layout = adapter;
-      renderVennDiagram(this.el, p);
-    } else {
-      render(this.el, p);
-    }
+    renderComponent();
   }
 }

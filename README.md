@@ -80,7 +80,7 @@ the package documentation is located at [![Open API Docs][docs]][docs-j-url]. An
 
 ## Venn Diagram
 
-Besides the main UpSet.js plot also Venn Diagrams for two or three sets are supported. It uses the same input formats and has similar functionality in terms of interaction.
+Besides the main UpSet.js plot also Venn Diagrams for up to five sets are supported. It uses the same input formats and has similar functionality in terms of interaction.
 
 ```python
 from upsetjs_jupyter_widget import UpSetJSVennDiagramWidget
@@ -92,6 +92,21 @@ v
 ![image](https://user-images.githubusercontent.com/4129778/84817608-8a574b80-b015-11ea-91b8-2ff17bb533e4.png)
 
 see also [venn.ipynb](https://upset.js.org/integrations/jupyter/venn.html)
+
+## Karnaugh Map
+
+Besides the main UpSet.js plot also a variant of a Karnaugh Map. It uses the same input formats and has similar functionality in terms of interaction.
+
+```python
+from upsetjs_jupyter_widget import UpSetJSKarnaughMapWidget
+v = UpSetJSKarnaughMapWidget[str]()
+v.from_dict(dict(one = ['a', 'b', 'c', 'e', 'g', 'h', 'k', 'l', 'm'], two = ['a', 'b', 'd', 'e', 'j'], three = ['a', 'e', 'f', 'g', 'h', 'i', 'j', 'l', 'm']))
+v
+```
+
+![image]()
+
+see also [kmap.ipynb](https://upset.js.org/integrations/jupyter/kmap.html)
 
 ## Dev Environment
 
@@ -109,7 +124,7 @@ pip install -e .
 jupyter nbextension install --sys-prefix --overwrite --py upsetjs_jupyter_widget
 jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
 jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0
-pipenv run jupyter labextension install .
+jupyter labextension install .
 ```
 
 ### Commands
