@@ -136,6 +136,30 @@ def _to_query_list(arr: t.List[UpSetQuery], model: "UpSetJSWidget"):
     return [_to_query(q) for q in arr]
 
 
+def _create_combination(
+    cs_name: str,
+    combination_type: UpSetSetType,
+    count: int,
+    sets: t.FrozenSet[UpSetSet],
+    color_lookup: t.Mapping[str, str],
+) -> UpSetSetCombination:
+    if combination_type == UpSetSetType.DISTINCT_INTERSECTION:
+        return UpSetSetDistinctIntersection[T](
+            cs_name, sets=sets, color=color_lookup.get(cs_name), cardinality=count,
+        )
+    if combination_type == UpSetSetType.INTERSECTION:
+        return UpSetSetIntersection[T](
+            cs_name, sets=sets, color=color_lookup.get(cs_name), cardinality=count,
+        )
+    if combination_type == UpSetSetType.UNION:
+        return UpSetSetUnion[T](
+            cs_name, sets=sets, color=color_lookup.get(cs_name), cardinality=count,
+        )
+    return UpSetSetComposite[T](
+        cs_name, sets=sets, color=color_lookup.get(cs_name), cardinality=count,
+    )
+
+
 class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
     """UpSet.js Base Widget
     """
@@ -463,36 +487,15 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
                 for s_obj in contained_sets:
                     s_obj.cardinality = min(s_obj.cardinality, count)
 
-            c_obj: UpSetSetCombination[T]
-            if combination_type == UpSetSetType.DISTINCT_INTERSECTION:
-                c_obj = UpSetSetDistinctIntersection[T](
+            set_intersections.append(
+                _create_combination(
                     cs_name,
-                    sets=frozenset(contained_sets),
-                    color=color_lookup.get(cs_name),
-                    cardinality=count,
+                    combination_type,
+                    count,
+                    frozenset(contained_sets),
+                    color_lookup,
                 )
-            elif combination_type == UpSetSetType.INTERSECTION:
-                c_obj = UpSetSetIntersection[T](
-                    cs_name,
-                    sets=frozenset(contained_sets),
-                    color=color_lookup.get(cs_name),
-                    cardinality=count,
-                )
-            elif combination_type == UpSetSetType.UNION:
-                c_obj = UpSetSetUnion[T](
-                    cs_name,
-                    sets=frozenset(contained_sets),
-                    color=color_lookup.get(cs_name),
-                    cardinality=count,
-                )
-            else:
-                c_obj = UpSetSetComposite[T](
-                    cs_name,
-                    sets=frozenset(contained_sets),
-                    color=color_lookup.get(cs_name),
-                    cardinality=count,
-                )
-            set_intersections.append(c_obj)
+            )
 
         self.clear_queries()
         self.selection = None
