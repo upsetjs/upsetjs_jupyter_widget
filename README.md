@@ -104,7 +104,7 @@ v.from_dict(dict(one = ['a', 'b', 'c', 'e', 'g', 'h', 'k', 'l', 'm'], two = ['a'
 v
 ```
 
-![image]()
+![image](https://user-images.githubusercontent.com/4129778/86368718-c9c0a180-bc7d-11ea-99c3-2086e6ec1422.png)
 
 see also [kmap.ipynb](https://upset.js.org/integrations/jupyter/kmap.html)
 
