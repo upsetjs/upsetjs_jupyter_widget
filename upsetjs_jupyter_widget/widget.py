@@ -458,22 +458,19 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
 
         base_sets: t.Dict[str, UpSetSet[T]] = {}
         set_intersections: t.List[UpSetSetCombination[T]] = []
+
         for cs_name, count in combinations.items():
-            set_names = cs_name.split(symbol)
             contained_sets: t.List[UpSetSet[T]] = []
 
-            for set_name in set_names:
-                if set_name in base_sets:
-                    contained_sets.append(base_sets[set_name])
-                    continue
-                set_obj = UpSetSet[T](
-                    set_name,
-                    elems=None,
-                    color=color_lookup.get(set_name),
-                    cardinality=0,
-                )
-                base_sets[set_name] = set_obj
-                contained_sets.append(set_obj)
+            for set_name in cs_name.split(symbol):
+                if set_name not in base_sets:
+                    base_sets[set_name] = UpSetSet[T](
+                        set_name,
+                        elems=None,
+                        color=color_lookup.get(set_name),
+                        cardinality=0,
+                    )
+                contained_sets.append(base_sets[set_name])
 
             if combination_type == UpSetSetType.DISTINCT_INTERSECTION:
                 for s_obj in contained_sets:

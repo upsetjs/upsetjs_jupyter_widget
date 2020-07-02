@@ -6,7 +6,7 @@
 
 # coding: utf-8
 # Copyright (c) Samuel Gratzl.
-# pylint: disable=W0221,C0103,C0116,W0212
+# pylint: disable=W0221,C0103,C0116,W0212,signature-differs
 """
 test case
 """
