@@ -13,6 +13,8 @@ import {
   ISetCombinations,
   ISets,
   fromIndicesArray,
+  SetCombinationType,
+  extractFromExpression,
 } from '@upsetjs/bundle';
 
 export interface IElem {
@@ -30,6 +32,23 @@ export function fixSets(sets: ISets<any>, elems: IElem[]) {
         elems: fromIndicesArray(set.elems, elems),
       })
     )
+  );
+}
+
+export function fromExpression(
+  combinations: { name: string; cardinality: number; set_names: string[]; type: SetCombinationType }[]
+) {
+  const type = combinations[0].type;
+  return extractFromExpression(
+    combinations.map((set) => ({
+      name: set.name,
+      set_names: set.set_names,
+      cardinality: set.cardinality,
+    })),
+    (c) => c.set_names,
+    {
+      type,
+    }
   );
 }
 

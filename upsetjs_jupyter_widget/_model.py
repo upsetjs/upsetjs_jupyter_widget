@@ -45,6 +45,7 @@ class UpSetBaseSet(t.Generic[T]):
     name: str
     color: t.Optional[str]
     elems: t.FrozenSet[T]
+    cardinality: int
 
     def __init__(
         self,
@@ -52,19 +53,14 @@ class UpSetBaseSet(t.Generic[T]):
         name: str,
         elems: t.Optional[t.FrozenSet[T]] = None,
         color: t.Optional[str] = None,
+        cardinality: t.Optional[int] = None,
     ):
         super().__init__()
         self.set_type = set_type
         self.name = name
         self.color = color
         self.elems = elems or frozenset()
-
-    @property
-    def cardinality(self):
-        """
-        the cardinality of this set
-        """
-        return len(self.elems)
+        self.cardinality = cardinality or len(self.elems)
 
 
 class UpSetSet(UpSetBaseSet[T]):
@@ -77,8 +73,9 @@ class UpSetSet(UpSetBaseSet[T]):
         name: str = "",
         elems: t.Optional[t.FrozenSet[T]] = None,
         color: t.Optional[str] = None,
+        cardinality: t.Optional[int] = None,
     ):
-        super().__init__(UpSetSetType.SET, name, elems, color)
+        super().__init__(UpSetSetType.SET, name, elems, color, cardinality)
 
     @property
     def degree(self):
@@ -88,7 +85,7 @@ class UpSetSet(UpSetBaseSet[T]):
         return 1
 
     def __repr__(self):
-        return f"UpSetSet(name={self.name}, elems={set(self.elems)})"
+        return f"UpSetSet(name={self.name}, cardinality={self.cardinality}, elems={set(self.elems)})"
 
 
 class UpSetSetCombination(UpSetBaseSet[T]):
@@ -108,8 +105,9 @@ class UpSetSetCombination(UpSetBaseSet[T]):
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
         color: t.Optional[str] = None,
+        cardinality: t.Optional[int] = None,
     ):
-        super().__init__(set_type, name, elems, color)
+        super().__init__(set_type, name, elems, color, cardinality)
         self.sets = sets or frozenset()
 
     @property
@@ -121,7 +119,7 @@ class UpSetSetCombination(UpSetBaseSet[T]):
 
     def __repr__(self):
         set_names = {s.name for s in self.sets}
-        return f"{self.__class__.__name__}(name={self.name}, sets={set_names}, elems={set(self.elems)})"
+        return f"{self.__class__.__name__}(name={self.name}, sets={set_names}, cardinality={self.cardinality}, elems={set(self.elems)})"
 
 
 class UpSetSetIntersection(UpSetSetCombination[T]):
@@ -135,8 +133,11 @@ class UpSetSetIntersection(UpSetSetCombination[T]):
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
         color: t.Optional[str] = None,
+        cardinality: t.Optional[int] = None,
     ):
-        super().__init__(UpSetSetType.INTERSECTION, name, elems, sets, color)
+        super().__init__(
+            UpSetSetType.INTERSECTION, name, elems, sets, color, cardinality
+        )
 
 
 class UpSetSetDistinctIntersection(UpSetSetCombination[T]):
@@ -150,8 +151,11 @@ class UpSetSetDistinctIntersection(UpSetSetCombination[T]):
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
         color: t.Optional[str] = None,
+        cardinality: t.Optional[int] = None,
     ):
-        super().__init__(UpSetSetType.DISTINCT_INTERSECTION, name, elems, sets, color)
+        super().__init__(
+            UpSetSetType.DISTINCT_INTERSECTION, name, elems, sets, color, cardinality
+        )
 
 
 class UpSetSetUnion(UpSetSetCombination[T]):
@@ -165,8 +169,9 @@ class UpSetSetUnion(UpSetSetCombination[T]):
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
         color: t.Optional[str] = None,
+        cardinality: t.Optional[int] = None,
     ):
-        super().__init__(UpSetSetType.UNION, name, elems, sets, color)
+        super().__init__(UpSetSetType.UNION, name, elems, sets, color, cardinality)
 
 
 class UpSetSetComposite(UpSetSetCombination[T]):
@@ -180,8 +185,9 @@ class UpSetSetComposite(UpSetSetCombination[T]):
         elems: t.Optional[t.FrozenSet[T]] = None,
         sets: t.Optional[t.FrozenSet[UpSetSet[T]]] = None,
         color: t.Optional[str] = None,
+        cardinality: t.Optional[int] = None,
     ):
-        super().__init__(UpSetSetType.COMPOSITE, name, elems, sets, color)
+        super().__init__(UpSetSetType.COMPOSITE, name, elems, sets, color, cardinality)
 
 
 UpSetSetLike = t.Union[

@@ -15,6 +15,8 @@ def compress_index_array(indices: t.Iterable[int]) -> t.Union[t.List[int], str]:
     compresses an indices array similar to a python range expression
     """
     elems: t.List[int] = list(indices)
+    if len(elems) <= 1:
+        return elems
 
     encoded: t.List[str] = []
 

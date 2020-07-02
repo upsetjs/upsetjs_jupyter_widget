@@ -31,6 +31,7 @@ from ._model import (
     T,
     UpSetQuery,
     UpSetSet,
+    UpSetSetType,
     UpSetSetCombination,
     UpSetSetComposite,
     UpSetSetIntersection,
@@ -198,6 +199,8 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
     title: str = Unicode(None, allow_none=True).tag(sync=True)
     description: str = Unicode(None, allow_none=True).tag(sync=True)
 
+    _expression_data: bool = Bool(None, allow_none=True).tag(sync=True)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.observe(self._sync_value, "value")
@@ -212,6 +215,8 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
         clone.sets = list(self.sets)
         clone.combinations = list(self.combinations)
         clone.queries = list(self.queries)
+        # pylint: disable=protected-access
+        clone._expression_data = self._expression_data
 
         clone.value = self.value
         clone.selection = self.selection
@@ -384,7 +389,7 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
 
     def _from_dict(
         self,
-        sets: t.Dict[str, t.Sequence[T]],
+        sets: t.Mapping[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,
@@ -397,6 +402,7 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
             elems.update(set_elems)
         self.elems = sorted(elems)
         self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
+        self._expression_data = False
         color_lookup = colors or {}
 
         base_sets: t.List[UpSetSet[T]] = [
@@ -408,6 +414,93 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
         self.sets = _sort_sets(base_sets, order_by, limit)
 
         return base_sets if limit is None else self.sets
+
+    def from_expression(
+        self,
+        combinations: t.Mapping[str, int],
+        combination_type: UpSetSetType = UpSetSetType.INTERSECTION,
+        symbol: str = "&",
+        order_by: t.Union[str, t.Sequence[str]] = "cardinality",
+        set_order_by: str = "cardinality",
+        colors: t.Mapping[str, str] = None,
+    ) -> "UpSetJSBaseWidget":
+        """
+        generates the list of sets from a dict
+        """
+        self.elems = []
+        self.elem_to_index = {}
+        self._expression_data = True
+        color_lookup = colors or {}
+
+        base_sets: t.Dict[str, UpSetSet[T]] = {}
+        set_intersections: t.List[UpSetSetCombination[T]] = []
+        for cs_name, count in combinations.items():
+            set_names = cs_name.split(symbol)
+            contained_sets: t.List[UpSetSet[T]] = []
+
+            for set_name in set_names:
+                if set_name in base_sets:
+                    contained_sets.append(base_sets[set_name])
+                    continue
+                set_obj = UpSetSet[T](
+                    set_name,
+                    elems=None,
+                    color=color_lookup.get(set_name),
+                    cardinality=0,
+                )
+                base_sets[set_name] = set_obj
+                contained_sets.append(set_obj)
+
+            if combination_type == UpSetSetType.DISTINCT_INTERSECTION:
+                for s_obj in contained_sets:
+                    s_obj.cardinality += count
+            elif len(contained_sets) == 1:
+                contained_sets[0].cardinality = count
+            elif combination_type == UpSetSetType.INTERSECTION:
+                for s_obj in contained_sets:
+                    s_obj.cardinality = max(s_obj.cardinality, count)
+            elif combination_type == UpSetSetType.UNION:
+                for s_obj in contained_sets:
+                    s_obj.cardinality = min(s_obj.cardinality, count)
+
+            c_obj: UpSetSetCombination[T]
+            if combination_type == UpSetSetType.DISTINCT_INTERSECTION:
+                c_obj = UpSetSetDistinctIntersection[T](
+                    cs_name,
+                    sets=frozenset(contained_sets),
+                    color=color_lookup.get(cs_name),
+                    cardinality=count,
+                )
+            elif combination_type == UpSetSetType.INTERSECTION:
+                c_obj = UpSetSetIntersection[T](
+                    cs_name,
+                    sets=frozenset(contained_sets),
+                    color=color_lookup.get(cs_name),
+                    cardinality=count,
+                )
+            elif combination_type == UpSetSetType.UNION:
+                c_obj = UpSetSetUnion[T](
+                    cs_name,
+                    sets=frozenset(contained_sets),
+                    color=color_lookup.get(cs_name),
+                    cardinality=count,
+                )
+            else:
+                c_obj = UpSetSetComposite[T](
+                    cs_name,
+                    sets=frozenset(contained_sets),
+                    color=color_lookup.get(cs_name),
+                    cardinality=count,
+                )
+            set_intersections.append(c_obj)
+
+        self.clear_queries()
+        self.selection = None
+        self.sets = _sort_sets(list(base_sets.values()), set_order_by, None)
+        self.combinations = _sort_combinations(
+            set_intersections, self.sets, order_by, None
+        )
+        return self
 
     def _from_dataframe(
         self,
@@ -422,6 +515,7 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
         """
         self.elems = sorted(data_frame.index)
         self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
+        self._expression_data = False
         color_lookup = colors or {}
 
         def to_set(name: str, series):
@@ -509,7 +603,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
 
     def from_dict(
         self,
-        sets: t.Dict[str, t.Sequence[T]],
+        sets: t.Mapping[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,
@@ -702,7 +796,7 @@ class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
 
     def from_dict(
         self,
-        sets: t.Dict[str, t.Sequence[T]],
+        sets: t.Mapping[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,
@@ -792,7 +886,7 @@ class UpSetJSKarnaughMapWidget(UpSetJSBaseWidget, t.Generic[T]):
 
     def from_dict(
         self,
-        sets: t.Dict[str, t.Sequence[T]],
+        sets: t.Mapping[str, t.Sequence[T]],
         order_by: str = "cardinality",
         limit: t.Optional[int] = None,
         colors: t.Mapping[str, str] = None,

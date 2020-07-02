@@ -24,9 +24,10 @@ import {
   KarnaughMapProps,
   categoricalAddon,
   createVennJSAdapter,
+  ISets,
 } from '@upsetjs/bundle';
 import { layout } from '@upsetjs/venn.js';
-import { fixCombinations, fixSets, resolveSet, IElem } from './utils';
+import { fixCombinations, fixSets, resolveSet, IElem, fromExpression } from './utils';
 
 const adapter = createVennJSAdapter(layout);
 
@@ -223,11 +224,17 @@ export class UpSetView extends DOMWidgetView {
       props.sets = fixSets(delta.sets, this.elems);
     }
     if (delta.combinations != null) {
-      const c = fixCombinations(delta.combinations, props.sets, this.elems);
-      if (c == null) {
-        delete props.combinations;
+      if (this.model.get('_expression_data')) {
+        const r = fromExpression(delta.combinations);
+        props.combinations = r.combinations as ISetCombinations<IElem>;
+        props.sets = r.sets as ISets<IElem>;
       } else {
-        props.combinations = c;
+        const c = fixCombinations(delta.combinations, props.sets, this.elems);
+        if (c == null) {
+          delete props.combinations;
+        } else {
+          props.combinations = c;
+        }
       }
     }
     if (delta.selection) {
