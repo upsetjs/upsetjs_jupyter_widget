@@ -8,5 +8,5 @@
 UpSet.js Jupyter Widget
 """
 
-version_info = (1, 3, 0)  # pylint: disable=C0103
+version_info = (1, 6, 0)  # pylint: disable=C0103
 __version__ = ".".join(map(str, version_info))

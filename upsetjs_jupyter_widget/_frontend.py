@@ -9,4 +9,4 @@ Information about the frontend package of the widgets.
 """
 
 MODULE_NAME = "@upsetjs/jupyter_widget"
-MODULE_VERSION = "^1.3.0"
+MODULE_VERSION = "^1.6.0"
