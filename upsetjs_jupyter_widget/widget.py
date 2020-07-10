@@ -642,7 +642,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
 
         if attributes is not None:
             attribute_df = (
-                data_frame[attributes]
+                data_frame.loc[:, attributes]
                 if isinstance(attributes, (list, tuple))
                 else attributes
             )
