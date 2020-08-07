@@ -17,7 +17,7 @@ pip install ipywidgets==7.5.1 upsetjs_jupyter_widget
 # for notebooks
 jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
 # for lab
-jupyter labextension install @jupyter-widgets/jupyterlab-manager @upsetjs_jupyter_widget
+jupyter labextension install @jupyter-widgets/jupyterlab-manager @upsetjs/jupyter_widget
 ```
 
 jupyter-lab 2.1.x:
@@ -28,7 +28,7 @@ pip install ipywidgets upsetjs_jupyter_widget
 # for notebooks
 jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
 # for lab
-jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0 @upsetjs_jupyter_widget
+jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0 @upsetjs/jupyter_widget
 ```
 
 ## Usage
