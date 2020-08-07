@@ -24,7 +24,7 @@ jupyter-lab 2.1.x:
 
 ```bash
 # some ipywidget 8.x.x alpha vesion
-pip install ipywidgets upsetjs_jupyter_widget
+pip install ipywidgetss==8.0.0a0 upsetjs_jupyter_widget
 # for notebooks
 jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
 # for lab
