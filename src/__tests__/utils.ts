@@ -2,7 +2,7 @@
  * @upsetjs/jupyter_widget
  * https://github.com/upsetjs/upsetjs_jupyter_widget
  *
- * Copyright (c) 2020 Samuel Gratzl <sam@sgratzl.com>
+ * Copyright (c) 2021 Samuel Gratzl <sam@sgratzl.com>
  */
 
 // Copyright (c) Jupyter Development Team.
@@ -99,7 +99,7 @@ export class DummyManager {
 }
 
 export interface Constructor<T> {
-  new (attributes?: any, options?: any): T;
+  new(attributes?: any, options?: any): T;
 }
 
 export function createTestModel<T extends widgets.WidgetModel>(constructor: Constructor<T>, attributes?: any): T {
