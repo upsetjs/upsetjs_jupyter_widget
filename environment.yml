@@ -1,0 +1,10 @@
+name: upsetjs_jupyter_widget
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python==3.9
+  - mypy
+  - pylint
+  - black
+  - bumpversion

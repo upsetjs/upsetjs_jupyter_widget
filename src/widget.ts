@@ -95,17 +95,17 @@ export class UpSetView extends DOMWidgetView {
     if (!s) {
       this.model.set('value', null);
     } else {
-      const setish: any = {
+      const setLike: any = {
         name: s.name,
         type: s.type,
         cardinality: s.cardinality,
         elems: s.elems.map((e) => this.elemToIndex.get(e)),
       };
       if (s.type !== 'set') {
-        setish.degree = s.degree;
-        setish.set_names = Array.from(s.sets).map((s) => s.name);
+        setLike.degree = s.degree;
+        setLike.set_names = Array.from(s.sets).map((s) => s.name);
       }
-      this.model.set('value', setish);
+      this.model.set('value', setLike);
     }
     this.props.selection = s;
     this.renderImpl();
