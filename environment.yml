@@ -11,3 +11,4 @@ dependencies:
   - pytest
   - jupyter
   - jupyterlab 
+  - pytest-cov
