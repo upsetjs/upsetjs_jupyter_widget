@@ -12,3 +12,12 @@ dependencies:
   - jupyter
   - jupyterlab
   - pytest-cov
+  - twine
+  - sphinx
+  - recommonmark
+  - sphinx_rtd_theme
+  - nbsphinx
+  - jupyter_sphinx
+  - nbsphinx-link
+  - pypandoc
+  - sphinx-autodoc-typehints
