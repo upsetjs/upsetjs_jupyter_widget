@@ -99,7 +99,7 @@ export class DummyManager {
 }
 
 export interface Constructor<T> {
-  new(attributes?: any, options?: any): T;
+  new (attributes?: any, options?: any): T;
 }
 
 export function createTestModel<T extends widgets.WidgetModel>(constructor: Constructor<T>, attributes?: any): T {
