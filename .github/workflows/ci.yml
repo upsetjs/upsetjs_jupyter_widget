@@ -40,7 +40,6 @@ jobs:
         with:
           node-version: '12.x'
       - run: npm i -g yarn
-      - run: yarn set version berry
       - name: Cache Conda
         uses: actions/cache@v1
         with:
