@@ -39,6 +39,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
+      - run: npm i -g yarn
+      - run: yarn set version berry
       - name: Cache Conda
         uses: actions/cache@v1
         with:
@@ -49,7 +51,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: 3.8
-          mamba-version: "*"
+          mamba-version: '*'
           channels: conda-forge,defaults
           channel-priority: true
           activate-environment: upsetjs_jupyter_widget
@@ -58,18 +60,18 @@ jobs:
           use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
       - name: pytest
         shell: bash -l {0}
-        run: npm run test:p:ci
+        run: yarn test:p:ci
       - name: Lint
         shell: bash -l {0}
-        run: npm run lint:p
+        run: yarn lint:p
 
       - name: Build Notebooks
         shell: bash -l {0}
-        run: npm run nbconvert
+        run: yarn nbconvert
 
       - name: Create Docu
         shell: bash -l {0}
-        run: npm run docs:p
+        run: yarn docs:p
 
       - run: |
           mkdir -p public/integrations/jupyter

@@ -10,5 +10,5 @@ dependencies:
   - bumpversion
   - pytest
   - jupyter
-  - jupyterlab 
+  - jupyterlab
   - pytest-cov

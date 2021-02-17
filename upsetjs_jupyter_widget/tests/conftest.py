@@ -14,8 +14,8 @@ test case
 
 import pytest
 
-from ipykernel.comm import Comm
-from ipywidgets import Widget
+from ipykernel.comm import Comm  # type: ignore
+from ipywidgets import Widget  # type: ignore
 
 
 class MockComm(Comm):
@@ -34,7 +34,7 @@ class MockComm(Comm):
         self.log_open = []
         self.log_send = []
         self.log_close = []
-        super(MockComm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def open(self, *args, **kwargs):
         """

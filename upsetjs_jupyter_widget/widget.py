@@ -10,9 +10,9 @@ UpSet.js Jupyter Widget
 
 import typing as t
 
-from ipywidgets import DOMWidget, Layout, ValueWidget, register
-from ipywidgets.widgets.trait_types import Color
-from traitlets import (
+from ipywidgets import DOMWidget, Layout, ValueWidget, register  # type: ignore
+from ipywidgets.widgets.trait_types import Color  # type: ignore
+from traitlets import (  # type: ignore
     Bool,
     Dict,
     Enum,
@@ -53,7 +53,9 @@ __all__ = ["UpSetJSWidget"]
 
 
 def _sort_sets(
-    sets: t.Sequence[UpSetSet[T]], order_by: str, limit: t.Optional[int] = None,
+    sets: t.Sequence[UpSetSet[T]],
+    order_by: str,
+    limit: t.Optional[int] = None,
 ) -> t.List[UpSetSet[T]]:
     key = None
     if order_by == "cardinality":
@@ -145,24 +147,35 @@ def _create_combination(
 ) -> UpSetSetCombination:
     if combination_type == UpSetSetType.DISTINCT_INTERSECTION:
         return UpSetSetDistinctIntersection[T](
-            cs_name, sets=sets, color=color_lookup.get(cs_name), cardinality=count,
+            cs_name,
+            sets=sets,
+            color=color_lookup.get(cs_name),
+            cardinality=count,
         )
     if combination_type == UpSetSetType.INTERSECTION:
         return UpSetSetIntersection[T](
-            cs_name, sets=sets, color=color_lookup.get(cs_name), cardinality=count,
+            cs_name,
+            sets=sets,
+            color=color_lookup.get(cs_name),
+            cardinality=count,
         )
     if combination_type == UpSetSetType.UNION:
         return UpSetSetUnion[T](
-            cs_name, sets=sets, color=color_lookup.get(cs_name), cardinality=count,
+            cs_name,
+            sets=sets,
+            color=color_lookup.get(cs_name),
+            cardinality=count,
         )
     return UpSetSetComposite[T](
-        cs_name, sets=sets, color=color_lookup.get(cs_name), cardinality=count,
+        cs_name,
+        sets=sets,
+        color=color_lookup.get(cs_name),
+        cardinality=count,
     )
 
 
 class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
-    """UpSet.js Base Widget
-    """
+    """UpSet.js Base Widget"""
 
     _model_name = Unicode("UpSetModel").tag(sync=True)
     _model_module = Unicode(MODULE_NAME).tag(sync=True)
@@ -185,12 +198,14 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
     elems: t.List[T] = List(default_value=[]).tag(sync=True)
     elem_to_index: t.Dict[T, int] = {}
 
-    sets: t.List[UpSetSet[T]] = List(Instance(UpSetSet), default_value=[],).tag(
-        sync=True, to_json=_to_set_list
-    )
+    sets: t.List[UpSetSet[T]] = List(
+        Instance(UpSetSet),
+        default_value=[],
+    ).tag(sync=True, to_json=_to_set_list)
 
     combinations: t.List[UpSetSetCombination[T]] = List(
-        Instance(UpSetSetCombination), default_value=[],
+        Instance(UpSetSetCombination),
+        default_value=[],
     ).tag(sync=True, to_json=_to_combination_list)
 
     value: t.Union[None, t.Mapping, t.List[int]] = Union(
@@ -424,7 +439,7 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
         elems: t.Set[T] = set()
         for set_elems in sets.values():
             elems.update(set_elems)
-        self.elems = sorted(elems)
+        self.elems = sorted(elems)  # type: ignore
         self.elem_to_index = {e: i for i, e in enumerate(self.elems)}
         self._expression_data = False
         color_lookup = colors or {}
@@ -539,8 +554,7 @@ class UpSetJSBaseWidget(ValueWidget, DOMWidget, t.Generic[T]):
 
 @register
 class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
-    """UpSet.js Widget
-    """
+    """UpSet.js Widget"""
 
     _render_mode = Unicode("upset").tag(sync=True)
 
@@ -706,7 +720,12 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         customize the generation of the sets
         """
         set_intersections = generate_distinct_intersections(
-            self.sets, min_degree, max_degree, empty, self.elems, colors=colors,
+            self.sets,
+            min_degree,
+            max_degree,
+            empty,
+            self.elems,
+            colors=colors,
         )
 
         self.combinations = _sort_combinations(
@@ -727,7 +746,12 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         customize the generation of the sets
         """
         set_unions = generate_unions(
-            self.sets, min_degree, max_degree, empty, self.elems, colors=colors,
+            self.sets,
+            min_degree,
+            max_degree,
+            empty,
+            self.elems,
+            colors=colors,
         )
 
         self.combinations = _sort_combinations(set_unions, self.sets, order_by, limit)
@@ -766,7 +790,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
         """
         adds another categorical UpSetAttribute to be visualized
         """
-        cats = categories if categories is not None else sorted(set(values))
+        cats = categories if categories is not None else list(sorted(set(values)))
         self.attrs = self.attrs + [
             UpSetAttribute[T]("categorical", name, values, categories=cats)
         ]
@@ -775,8 +799,7 @@ class UpSetJSWidget(UpSetJSBaseWidget, t.Generic[T]):
 
 @register
 class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
-    """UpSet.js Venn Diagram Widget
-    """
+    """UpSet.js Venn Diagram Widget"""
 
     _render_mode = Unicode("venn").tag(sync=True)
 
@@ -825,7 +848,9 @@ class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
         return self._generate_distinct_intersections(base_sets, colors=colors)
 
     def _generate_distinct_intersections(
-        self, base_sets: t.List[UpSetSet[T]], colors: t.Mapping[str, str] = None,
+        self,
+        base_sets: t.List[UpSetSet[T]],
+        colors: t.Mapping[str, str] = None,
     ) -> "UpSetJSVennDiagramWidget":
         set_intersections = generate_distinct_intersections(
             base_sets, 1, None, True, self.elems, colors=colors
@@ -839,8 +864,7 @@ class UpSetJSVennDiagramWidget(UpSetJSBaseWidget, t.Generic[T]):
 
 @register
 class UpSetJSEulerDiagramWidget(UpSetJSVennDiagramWidget, t.Generic[T]):
-    """UpSet.js Euler Diagram Widget
-    """
+    """UpSet.js Euler Diagram Widget"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -860,8 +884,7 @@ class UpSetJSEulerDiagramWidget(UpSetJSVennDiagramWidget, t.Generic[T]):
 
 @register
 class UpSetJSKarnaughMapWidget(UpSetJSBaseWidget, t.Generic[T]):
-    """UpSet.js Karnaugh Map Widget
-    """
+    """UpSet.js Karnaugh Map Widget"""
 
     _render_mode = Unicode("kmap").tag(sync=True)
 
@@ -915,7 +938,9 @@ class UpSetJSKarnaughMapWidget(UpSetJSBaseWidget, t.Generic[T]):
         return self._generate_distinct_intersections(base_sets, colors=colors)
 
     def _generate_distinct_intersections(
-        self, base_sets: t.List[UpSetSet[T]], colors: t.Mapping[str, str] = None,
+        self,
+        base_sets: t.List[UpSetSet[T]],
+        colors: t.Mapping[str, str] = None,
     ) -> "UpSetJSKarnaughMapWidget":
         set_intersections = generate_distinct_intersections(
             base_sets, 1, None, True, self.elems, colors=colors
