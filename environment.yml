@@ -3,14 +3,16 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python==3.8
+  - python==3.9
   - mypy
   - pylint
   - black
   - bumpversion
+  - ipywidgets
+  - jupyterlab
+  - pandas
   - pytest
   - jupyter
-  - jupyterlab
   - pytest-cov
   - twine
   - sphinx
