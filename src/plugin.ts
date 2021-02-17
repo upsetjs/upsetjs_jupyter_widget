@@ -2,7 +2,7 @@
  * @upsetjs/jupyter_widget
  * https://github.com/upsetjs/upsetjs_jupyter_widget
  *
- * Copyright (c) 2020 Samuel Gratzl <sam@sgratzl.com>
+ * Copyright (c) 2021 Samuel Gratzl <sam@sgratzl.com>
  */
 
 import { Application, IPlugin } from '@phosphor/application';

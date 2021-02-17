@@ -10,25 +10,13 @@ This package is part of the UpSet.js ecosystem located at the main [Github Monor
 
 You can install using `pip`:
 
-jupyter-lab 1.2.x:
-
-```bash
-pip install ipywidgets==7.5.1 upsetjs_jupyter_widget
-# for notebooks
-jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
-# for lab
-jupyter labextension install @jupyter-widgets/jupyterlab-manager @upsetjs/jupyter_widget
-```
-
-jupyter-lab 2.1.x:
-
 ```bash
 # some ipywidget 8.x.x alpha vesion
-pip install ipywidgets==8.0.0a0 upsetjs_jupyter_widget
+pip install ipywidgets upsetjs_jupyter_widget
 # for notebooks
 jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
 # for lab
-jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0 @upsetjs/jupyter_widget
+jupyter labextension install @jupyter-widgets/jupyterlab-manager upsetjs_jupyter_widget
 ```
 
 ## Usage
@@ -115,16 +103,15 @@ npm i -g yarn
 yarn set version berry
 yarn
 yarn pnpify --sdk vscode
-pipenv
+conda create -f environment.yml
 ```
 
 ```sh
-pipenv shell
+conda activate upsetjs_jupyter_widget
 pip install -e .
 jupyter nbextension install --sys-prefix --overwrite --py upsetjs_jupyter_widget
 jupyter nbextension enable --sys-prefix --py upsetjs_jupyter_widget
-jupyter labextension install @jupyter-widgets/jupyterlab-manager@3.0.0-alpha.0
-jupyter labextension install .
+jupyter labextension install @jupyter-widgets/jupyterlab-manager .
 ```
 
 ### Commands

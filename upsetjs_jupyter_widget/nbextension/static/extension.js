@@ -2,7 +2,7 @@
  * @upsetjs/jupyter_widget
  * https://github.com/upsetjs/upsetjs_jupyter_widget
  *
- * Copyright (c) 2020 Samuel Gratzl <sam@sgratzl.com>
+ * Copyright (c) 2021 Samuel Gratzl <sam@sgratzl.com>
  */
 
 // Entry point for the notebook bundle containing custom model definitions.
@@ -19,6 +19,6 @@ define(function () {
   });
   // Export the required load_ipython_extension function
   return {
-    load_ipython_extension: function () {},
+    load_ipython_extension: function () { },
   };
 });

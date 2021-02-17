@@ -2,7 +2,7 @@
  * @upsetjs/jupyter_widget
  * https://github.com/upsetjs/upsetjs_jupyter_widget
  *
- * Copyright (c) 2020 Samuel Gratzl <sam@sgratzl.com>
+ * Copyright (c) 2021 Samuel Gratzl <sam@sgratzl.com>
  */
 
 /**
@@ -11,7 +11,7 @@
  * The html widget manager assumes that this is the same as the npm package
  * version number.
  */
-export const MODULE_VERSION = '1.6.0';
+export const MODULE_VERSION = '1.9.0';
 
 /*
  * The current package name.

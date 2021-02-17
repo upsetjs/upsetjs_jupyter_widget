@@ -1,0 +1,25 @@
+name: upsetjs_jupyter_widget
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python==3.9
+  - mypy
+  - pylint
+  - black
+  - bumpversion
+  - ipywidgets
+  - jupyterlab
+  - pandas
+  - pytest
+  - jupyter
+  - pytest-cov
+  - twine
+  - sphinx
+  - recommonmark
+  - sphinx_rtd_theme
+  - nbsphinx
+  - jupyter_sphinx
+  - nbsphinx-link
+  - pypandoc
+  - sphinx-autodoc-typehints

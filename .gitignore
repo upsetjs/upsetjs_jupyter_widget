@@ -63,6 +63,7 @@ instance/
 docs/_build/
 docs/source/_static/embed-bundle.js
 docs/source/_static/embed-bundle.js.map
+docs/source/_static/embed-bundle.js.LICENSE.txt
 
 # PyBuilder
 target/
@@ -167,3 +168,4 @@ src/**/*.d.ts
 /MANIFEST
 /examples/*.html
 /.pypirc
+.pnp.js
