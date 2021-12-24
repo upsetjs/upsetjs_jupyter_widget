@@ -90,7 +90,7 @@ def _sort_combinations(
         if isinstance(order_by, str)
         else [to_key(v) for v in order_by]
     )
-    out_list = sorted(combinations, key=lambda s: tuple([k(s) for k in keys]))
+    out_list = sorted(combinations, key=lambda s: tuple((k(s) for k in keys)))
     if limit is not None:
         return out_list[:limit]
     return out_list

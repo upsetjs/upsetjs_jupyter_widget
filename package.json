@@ -63,7 +63,7 @@
     "release": "release-it --disable-metrics --npm.skipChecks"
   },
   "dependencies": {
-    "@jupyter-widgets/base": ">=4",
+    "@jupyter-widgets/base": ">=2",
     "@upsetjs/bundle": "~1.10.0",
     "@upsetjs/venn.js": "^1.4.2"
   },
