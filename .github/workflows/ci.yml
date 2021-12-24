@@ -11,7 +11,6 @@ jobs:
         with:
           node-version: 16
       - run: npm i -g yarn
-      - run: yarn set version berry
       - run: yarn config set checksumBehavior ignore
       - name: Cache Node.js modules
         uses: actions/cache@v2
@@ -21,17 +20,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn3-
       - run: yarn install
-        env:
-          CI: true
       - run: yarn build
-        env:
-          CI: true
       - run: yarn lint
-        env:
-          CI: true
       - run: yarn test --ci --coverage --maxWorkers=2
-        env:
-          CI: true
   build_python:
     runs-on: ubuntu-latest
     steps:
@@ -40,6 +31,15 @@ jobs:
         with:
           node-version: 16
       - run: npm i -g yarn
+      - run: yarn config set checksumBehavior ignore
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: ./.yarn
+          key: ${{ runner.os }}-yarn3-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn3-
+      - run: yarn install
       - name: Cache Conda
         uses: actions/cache@v2
         with:
