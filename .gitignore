@@ -156,8 +156,6 @@ upsetjs_jupyter_widget/labextension/*.tgz
 # Packed lab extensions
 upsetjs_jupyter_widget/labextension
 
-.yarnrc.yml
-.yarn
 *.tsbuildinfo
 .vscode
 src/**/*.js
@@ -168,4 +166,9 @@ src/**/*.d.ts
 /MANIFEST
 /examples/*.html
 /.pypirc
-.pnp.js
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/versions
+.pnp.*

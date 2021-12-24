@@ -5,3 +5,7 @@
     "typeRoots": ["node_modules/@types"]
   }
 }
+{
+  "extends": "./tsconfig.c.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "*.js"]
+}

@@ -7,41 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2.1.4
-        with:
-          node-version: '12.x'
-      - run: npm i -g yarn
-      - run: yarn set version berry
-      - run: yarn config set checksumBehavior ignore
-      - name: Cache Node.js modules
-        uses: actions/cache@v2.1.4
-        with:
-          path: ./.yarn
-          key: ${{ runner.os }}-yarn3-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn3-
-      - run: yarn install
-        env:
-          CI: true
-      - run: yarn build
-        env:
-          CI: true
-      - run: yarn lint
-        env:
-          CI: true
-      - run: yarn test --ci --coverage --maxWorkers=2
-        env:
-          CI: true
-  build_python:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2.1.4
-        with:
-          node-version: '12.x'
-      - run: npm i -g yarn
       - name: Cache Conda
-        uses: actions/cache@v2.1.4
+        uses: actions/cache@v2
         with:
           path: ~/conda_pkgs_dir
           key: ${{ runner.os }}-conda6-${{ hashFiles('environment.yml') }}
@@ -49,11 +16,11 @@ jobs:
             ${{ runner.os }}-conda6-
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: 3.9
+          python-version: 3.8
           mamba-version: '*'
           channels: conda-forge,defaults
           channel-priority: true
-          activate-environment: upsetjs_jupyter_widget
+          activate-environment: cpe
           environment-file: environment.yml
           auto-activate-base: false
           use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
