@@ -7,6 +7,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - run: npm i -g yarn
+      - run: yarn set version berry
+      - run: yarn config set checksumBehavior ignore
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          path: ./.yarn
+          key: ${{ runner.os }}-yarn3-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn3-
+      - run: yarn install
+        env:
+          CI: true
+      - run: yarn build
+        env:
+          CI: true
+      - run: yarn lint
+        env:
+          CI: true
+      - run: yarn test --ci --coverage --maxWorkers=2
+        env:
+          CI: true
+  build_python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - run: npm i -g yarn
       - name: Cache Conda
         uses: actions/cache@v2
         with:
@@ -50,15 +83,15 @@ jobs:
           mv docs/build/*.html public/api/jupyter/
           find . -type f -name "*.html" -print0 | xargs -0 sed -i 's/"_/"/g'
 
-      - name: Deploy Master
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+      - name: Deploy Main
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: upsetjs/actions-gh-pages@sgratzl
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           external_repository: upsetjs/upsetjs.github.io
-          publish_branch: master
+          publish_branch: main
           publish_dir: ./public
           enable_jekyll: true
           remove_path_spec: 'integrations/jupyter/,api/jupyter/'
@@ -78,7 +111,7 @@ jobs:
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           external_repository: upsetjs/upsetjs.github.io
-          publish_branch: master
+          publish_branch: main
           publish_dir: ./public
           enable_jekyll: true
           remove_path_spec: 'next/integrations/jupyter/,next/api/jupyter/'
